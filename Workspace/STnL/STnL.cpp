@@ -4,6 +4,8 @@
 #include "stdafx.h"
 #include "STnL.h"
 
+#include "Global.h"
+
 #define MAX_LOADSTRING 100
 
 // Global Variables:
@@ -42,14 +44,56 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 
 	hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_STNL));
 
+	// TODO: 临时在这儿创建个bitmap
+	BITMAPINFO bitmapinfo;
+	memset(&bitmapinfo, 0, sizeof(BITMAPINFO));
+	bitmapinfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+	bitmapinfo.bmiHeader.biWidth = DEFAULT_WINDOW_WIDTH;
+	bitmapinfo.bmiHeader.biHeight = -DEFAULT_WINDOW_HEIGHT;
+	bitmapinfo.bmiHeader.biPlanes = 1;
+	bitmapinfo.bmiHeader.biBitCount = 32;
+	bitmapinfo.bmiHeader.biCompression = BI_RGB;
+	bitmapinfo.bmiHeader.biSizeImage = 0;
+	bitmapinfo.bmiHeader.biClrUsed = 0;
+	bitmapinfo.bmiHeader.biClrImportant = 0;
+
+	void* backBuffer = 0;
+
+	HBITMAP hBitmap = CreateDIBSection(GetDC(NULL), &bitmapinfo, DIB_RGB_COLORS, &backBuffer, NULL, 0);
+	HDC compatibleDC = CreateCompatibleDC(NULL);
+	SelectObject(compatibleDC, hBitmap);
+
 	// Main message loop:
-	while (GetMessage(&msg, NULL, 0, 0))
+	while (true)
 	{
-		if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
+		// 处理Windows消息
+		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 		{
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
+			if (msg.message == WM_QUIT)
+			{
+				break;
+			}
+
+			if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
+			{
+				TranslateMessage(&msg);
+				DispatchMessage(&msg);
+			}
 		}
+
+		// 更新和渲染
+		char* cursor = (char*)backBuffer;
+		static int color = 0;
+		color++;
+		for (int i = 0; i < DEFAULT_WINDOW_WIDTH * DEFAULT_WINDOW_HEIGHT * 4 / 2; i++)
+		{
+			*cursor = color;
+			cursor++;
+		}
+
+		HDC currentDC = GetDC(g_hWnd);
+		BitBlt(currentDC, 0, 0, DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT, compatibleDC, 0, 0, SRCCOPY);
+		ReleaseDC(g_hWnd, currentDC);
 	}
 
 	return (int) msg.wParam;
@@ -107,13 +151,26 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
    hInst = hInstance; // Store instance handle in our global variable
 
-   hWnd = CreateWindow(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-      CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, NULL, NULL, hInstance, NULL);
+   // 创建一个客户区尺寸为DEFAULT_WINDOW_WIDTH * DEFAULT_WINDOW_HEIGHT，不能resize，不能最大化的窗口
+   RECT rect;
+   rect.top = 0;
+   rect.left = 0;
+   rect.right = DEFAULT_WINDOW_WIDTH;
+   rect.bottom = DEFAULT_WINDOW_HEIGHT;
+
+   DWORD style = WS_OVERLAPPEDWINDOW & ~(WS_THICKFRAME | WS_MAXIMIZEBOX);
+
+   AdjustWindowRect(&rect, style, TRUE);
+
+   hWnd = CreateWindow(szWindowClass, szTitle, style,
+	   CW_USEDEFAULT, 0, rect.right - rect.left, rect.bottom - rect.top, NULL, NULL, hInstance, NULL);
 
    if (!hWnd)
    {
       return FALSE;
    }
+
+   g_hWnd = hWnd;
 
    ShowWindow(hWnd, nCmdShow);
    UpdateWindow(hWnd);
