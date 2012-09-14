@@ -1,4 +1,0 @@
-#define DEFAULT_WINDOW_WIDTH 640
-#define DEFAULT_WINDOW_HEIGHT 480
-
-extern HWND g_hWnd;

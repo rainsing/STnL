@@ -4,7 +4,8 @@
 #include "stdafx.h"
 #include "STnL.h"
 
-#include "Global.h"
+#include "Application.h"
+#include "BackBuffer.h"
 
 #define MAX_LOADSTRING 100
 
@@ -12,6 +13,10 @@
 HINSTANCE hInst;								// current instance
 TCHAR szTitle[MAX_LOADSTRING];					// The title bar text
 TCHAR szWindowClass[MAX_LOADSTRING];			// the main window class name
+
+HWND hWnd = NULL;
+int nWindowWidth = 640;
+int nWindowHeight = 480;
 
 // Forward declarations of functions included in this code module:
 ATOM				MyRegisterClass(HINSTANCE hInstance);
@@ -44,26 +49,13 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 
 	hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_STNL));
 
-	// TODO: 临时在这儿创建个bitmap
-	BITMAPINFO bitmapinfo;
-	memset(&bitmapinfo, 0, sizeof(BITMAPINFO));
-	bitmapinfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-	bitmapinfo.bmiHeader.biWidth = DEFAULT_WINDOW_WIDTH;
-	bitmapinfo.bmiHeader.biHeight = -DEFAULT_WINDOW_HEIGHT;
-	bitmapinfo.bmiHeader.biPlanes = 1;
-	bitmapinfo.bmiHeader.biBitCount = 32;
-	bitmapinfo.bmiHeader.biCompression = BI_RGB;
-	bitmapinfo.bmiHeader.biSizeImage = 0;
-	bitmapinfo.bmiHeader.biClrUsed = 0;
-	bitmapinfo.bmiHeader.biClrImportant = 0;
+	// 应用程序初始化
+	Application application;
+	application.Initialize(hWnd, nWindowWidth, nWindowHeight);
 
-	void* backBuffer = 0;
+	// ---------------------------------
 
-	HBITMAP hBitmap = CreateDIBSection(GetDC(NULL), &bitmapinfo, DIB_RGB_COLORS, &backBuffer, NULL, 0);
-	HDC compatibleDC = CreateCompatibleDC(NULL);
-	SelectObject(compatibleDC, hBitmap);
-
-	// Main message loop:
+	// 主循环
 	while (true)
 	{
 		// 处理Windows消息
@@ -81,20 +73,19 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 			}
 		}
 
-		// 更新和渲染
-		char* cursor = (char*)backBuffer;
-		static int color = 0;
-		color++;
-		for (int i = 0; i < DEFAULT_WINDOW_WIDTH * DEFAULT_WINDOW_HEIGHT * 4 / 2; i++)
-		{
-			*cursor = color;
-			cursor++;
-		}
-
-		HDC currentDC = GetDC(g_hWnd);
-		BitBlt(currentDC, 0, 0, DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT, compatibleDC, 0, 0, SRCCOPY);
-		ReleaseDC(g_hWnd, currentDC);
+		// 应用程序更新和渲染
+		application.Update();
+		application.Render();
 	}
+
+	// ---------------------------------
+
+	// 应用程序销毁
+	application.Destroy();
+
+#ifdef _DEBUG
+	_CrtDumpMemoryLeaks();
+#endif
 
 	return (int) msg.wParam;
 }
@@ -147,16 +138,14 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 //
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
-   HWND hWnd;
-
    hInst = hInstance; // Store instance handle in our global variable
 
-   // 创建一个客户区尺寸为DEFAULT_WINDOW_WIDTH * DEFAULT_WINDOW_HEIGHT，不能resize，不能最大化的窗口
+   // 创建一个客户区尺寸为g_windowWidth * g_windowHeight，不能resize，不能最大化的窗口
    RECT rect;
    rect.top = 0;
    rect.left = 0;
-   rect.right = DEFAULT_WINDOW_WIDTH;
-   rect.bottom = DEFAULT_WINDOW_HEIGHT;
+   rect.right = nWindowWidth;
+   rect.bottom = nWindowHeight;
 
    DWORD style = WS_OVERLAPPEDWINDOW & ~(WS_THICKFRAME | WS_MAXIMIZEBOX);
 
@@ -169,8 +158,6 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    {
       return FALSE;
    }
-
-   g_hWnd = hWnd;
 
    ShowWindow(hWnd, nCmdShow);
    UpdateWindow(hWnd);

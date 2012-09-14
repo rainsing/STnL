@@ -209,11 +209,19 @@
 			</File>
 		</Filter>
 		<File
-			RelativePath=".\Global.cpp"
+			RelativePath=".\Application.cpp"
 			>
 		</File>
 		<File
-			RelativePath=".\Global.h"
+			RelativePath=".\Application.h"
+			>
+		</File>
+		<File
+			RelativePath=".\BackBuffer.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\BackBuffer.h"
 			>
 		</File>
 		<File
@@ -238,6 +246,10 @@
 		</File>
 		<File
 			RelativePath=".\stdafx.h"
+			>
+		</File>
+		<File
+			RelativePath=".\Types.h"
 			>
 		</File>
 	</Files>
