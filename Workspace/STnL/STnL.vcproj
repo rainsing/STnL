@@ -225,6 +225,14 @@
 			>
 		</File>
 		<File
+			RelativePath=".\Renderer.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\Renderer.h"
+			>
+		</File>
+		<File
 			RelativePath=".\stdafx.cpp"
 			>
 			<FileConfiguration
@@ -250,6 +258,22 @@
 		</File>
 		<File
 			RelativePath=".\Types.h"
+			>
+		</File>
+		<File
+			RelativePath=".\Utilities.cpp"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					UsePrecompiledHeader="0"
+				/>
+			</FileConfiguration>
+		</File>
+		<File
+			RelativePath=".\Utilities.h"
 			>
 		</File>
 	</Files>

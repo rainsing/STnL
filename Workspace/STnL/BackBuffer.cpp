@@ -63,3 +63,8 @@ void BackBuffer::Clear( Color color )
 		*cursor++ = color;
 	}
 }
+
+void BackBuffer::Clear( void )
+{
+	ZeroMemory(m_colorData, m_width * m_height * sizeof(Color));
+}

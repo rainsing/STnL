@@ -11,6 +11,9 @@
 				的最后调用其Present()函数将buffer的内容blit到显示设备上。
 				这是这个软件渲染器中唯一一个和硬件打交道的对象。
 *********************************************************************/
+#ifndef BackBuffer_h__
+#define BackBuffer_h__
+
 #include "Types.h"
 
 class BackBuffer
@@ -21,6 +24,7 @@ public:
 	~BackBuffer();
 
 	void Clear(Color color);
+	void Clear(void);	// 快速clear至全黑
 	void Present(void);
 	inline void SetPixel(int x, int y, Color color);
 
@@ -40,3 +44,5 @@ void BackBuffer::SetPixel( int x, int y, Color color )
 {
 	*(m_colorData + y * m_width + x) = color;
 }
+
+#endif // BackBuffer_h__

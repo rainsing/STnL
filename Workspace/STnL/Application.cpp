@@ -13,13 +13,16 @@
 #include "stdafx.h"
 #include "Application.h"
 
+#include "Renderer.h"
 #include "BackBuffer.h"
+#include "Utilities.h"
 #include "Types.h"
 
 Application::Application( void )
 {
 	m_initialized = false;
 	m_backBuffer = NULL;
+	m_renderer = NULL;
 }
 
 Application::~Application()
@@ -30,8 +33,29 @@ Application::~Application()
 void Application::Initialize( HWND hWnd, int windowWidth, int windowHeight )
 {
 	m_backBuffer = new BackBuffer(hWnd, windowWidth, windowHeight);
+	m_renderer = new Renderer();
 
 	m_initialized = true;
+}
+
+void Application::Destroy( void )
+{
+	if (!m_initialized)
+	{
+		return;
+	}
+
+	if (m_renderer)
+	{
+		delete m_renderer;
+		m_renderer = NULL;
+	}
+
+	if (m_backBuffer)
+	{
+		delete m_backBuffer;
+		m_backBuffer = NULL;
+	}
 }
 
 void Application::Update( void )
@@ -49,23 +73,10 @@ void Application::Render( void )
 		return;
 	}
 
-	m_backBuffer->Clear(COLOR_RGB(0, 0, 0));
+	m_backBuffer->Clear();
 
-	m_backBuffer->SetPixel(320, 240, COLOR_RGB(255, 255, 255));
+	m_renderer->SetRenderTarget(m_backBuffer);
+	m_renderer->Render();
 
 	m_backBuffer->Present();
-}
-
-void Application::Destroy( void )
-{
-	if (!m_initialized)
-	{
-		return;
-	}
-
-	if (m_backBuffer)
-	{
-		delete m_backBuffer;
-		m_backBuffer = NULL;
-	}
 }
