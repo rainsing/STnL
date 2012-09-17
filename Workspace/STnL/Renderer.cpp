@@ -65,14 +65,6 @@ void Renderer::DrawLine( int x0, int y0, int x1, int y1, Color color )
 
 void Renderer::Render( void )
 {
-	/*int x0 = 320, y0 = 240;
-	int x1 = 300, y1 = 350;
-	int x2 = 520, y2 = 400;
-
-	DrawLine(x0, y0, x1, y1, COLOR_RGB(255, 255, 255));
-	DrawLine(x0, y0, x2, y2, COLOR_RGB(255, 255, 255));
-	DrawLine(x1, y1, x2, y2, COLOR_RGB(255, 255, 255));*/
-
 	for (unsigned i = 0; i < m_renderUnitList.size(); i++)
 	{
 		RenderUnit* renderUnit = m_renderUnitList[i];
@@ -94,14 +86,14 @@ void Renderer::Render( void )
 		unsigned nTriangles = renderUnit->m_ib->Size() / 3;
 		for (unsigned j = 0; j < nTriangles; j++)
 		{
-			int x0 = (int)((vsOuts[(*renderUnit->m_ib)[3 * j + 0]].clipSpacePosition.x + 1.0f) * (m_renderTarget->GetWidth() >> 1));
-			int y0 = (int)((vsOuts[(*renderUnit->m_ib)[3 * j + 0]].clipSpacePosition.y + 1.0f) * (m_renderTarget->GetHeight() >> 1));
+			int x0 = (int)(( vsOuts[(*renderUnit->m_ib)[3 * j + 0]].clipSpacePosition.x + 1.0f) * (m_renderTarget->GetWidth() >> 1));
+			int y0 = (int)((-vsOuts[(*renderUnit->m_ib)[3 * j + 0]].clipSpacePosition.y + 1.0f) * (m_renderTarget->GetHeight() >> 1));
 
-			int x1 = (int)((vsOuts[(*renderUnit->m_ib)[3 * j + 1]].clipSpacePosition.x + 1.0f) * (m_renderTarget->GetWidth() >> 1));
-			int y1 = (int)((vsOuts[(*renderUnit->m_ib)[3 * j + 1]].clipSpacePosition.y + 1.0f) * (m_renderTarget->GetHeight() >> 1));
+			int x1 = (int)(( vsOuts[(*renderUnit->m_ib)[3 * j + 1]].clipSpacePosition.x + 1.0f) * (m_renderTarget->GetWidth() >> 1));
+			int y1 = (int)((-vsOuts[(*renderUnit->m_ib)[3 * j + 1]].clipSpacePosition.y + 1.0f) * (m_renderTarget->GetHeight() >> 1));
 
-			int x2 = (int)((vsOuts[(*renderUnit->m_ib)[3 * j + 2]].clipSpacePosition.x + 1.0f) * (m_renderTarget->GetWidth() >> 1));
-			int y2 = (int)((vsOuts[(*renderUnit->m_ib)[3 * j + 2]].clipSpacePosition.y + 1.0f) * (m_renderTarget->GetHeight() >> 1));
+			int x2 = (int)(( vsOuts[(*renderUnit->m_ib)[3 * j + 2]].clipSpacePosition.x + 1.0f) * (m_renderTarget->GetWidth() >> 1));
+			int y2 = (int)((-vsOuts[(*renderUnit->m_ib)[3 * j + 2]].clipSpacePosition.y + 1.0f) * (m_renderTarget->GetHeight() >> 1));
 
 			DrawLine(x0, y0, x1, y1, COLOR_RGB(255, 255, 255));
 			DrawLine(x0, y0, x2, y2, COLOR_RGB(255, 255, 255));

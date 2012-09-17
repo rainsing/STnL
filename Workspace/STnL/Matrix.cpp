@@ -12,6 +12,8 @@
 #include "stdafx.h"
 #include "Matrix.h"
 
+#include "Utilities.h"
+
 #include <math.h>
 
 Matrix4 Matrix4::IDENTITY(	1.0f, 0.0f, 0.0f, 0.0f,
@@ -47,6 +49,33 @@ Vector4 Matrix4::Transform( const Vector4& vec )
 	return out;
 }
 
+void MatrixMultiply( Matrix4& out, const Matrix4& a, const Matrix4& b )
+{
+	Matrix4 temp;
+
+	temp.m11 = a.m11 * b.m11 + a.m12 * b.m21 + a.m13 * b.m31 + a.m14 * b.m41;
+	temp.m12 = a.m11 * b.m12 + a.m12 * b.m22 + a.m13 * b.m32 + a.m14 * b.m42;
+	temp.m13 = a.m11 * b.m13 + a.m12 * b.m23 + a.m13 * b.m33 + a.m14 * b.m43;
+	temp.m14 = a.m11 * b.m14 + a.m12 * b.m24 + a.m13 * b.m34 + a.m14 * b.m44;
+
+	temp.m21 = a.m21 * b.m11 + a.m22 * b.m21 + a.m23 * b.m31 + a.m24 * b.m41;
+	temp.m22 = a.m21 * b.m12 + a.m22 * b.m22 + a.m23 * b.m32 + a.m24 * b.m42;
+	temp.m23 = a.m21 * b.m13 + a.m22 * b.m23 + a.m23 * b.m33 + a.m24 * b.m43;
+	temp.m24 = a.m21 * b.m14 + a.m22 * b.m24 + a.m23 * b.m34 + a.m24 * b.m44;
+
+	temp.m31 = a.m31 * b.m11 + a.m32 * b.m21 + a.m33 * b.m31 + a.m34 * b.m41;
+	temp.m32 = a.m31 * b.m12 + a.m32 * b.m22 + a.m33 * b.m32 + a.m34 * b.m42;
+	temp.m33 = a.m31 * b.m13 + a.m32 * b.m23 + a.m33 * b.m33 + a.m34 * b.m43;
+	temp.m34 = a.m31 * b.m14 + a.m32 * b.m24 + a.m33 * b.m34 + a.m34 * b.m44;
+
+	temp.m41 = a.m41 * b.m11 + a.m42 * b.m21 + a.m43 * b.m31 + a.m44 * b.m41;
+	temp.m42 = a.m41 * b.m12 + a.m42 * b.m22 + a.m43 * b.m32 + a.m44 * b.m42;
+	temp.m43 = a.m41 * b.m13 + a.m42 * b.m23 + a.m43 * b.m33 + a.m44 * b.m43;
+	temp.m44 = a.m41 * b.m14 + a.m42 * b.m24 + a.m43 * b.m34 + a.m44 * b.m44;
+
+	out = temp;
+}
+
 Matrix4& MakeProjectionMatrix( Matrix4& out, float zn, float zf, float fov, float aspect )
 {
 	ZeroMemory(&out, sizeof(Matrix4));
@@ -64,43 +93,55 @@ Matrix4& MakeProjectionMatrix( Matrix4& out, float zn, float zf, float fov, floa
 	return out;
 }
 
-void MatrixMultiply( Matrix4& out, const Matrix4& a, const Matrix4& b )
-{
-	ZeroMemory(&out, sizeof(Matrix4));
-
-	out.m11 = a.m11 * b.m11 + a.m12 * b.m21 + a.m13 * b.m31 + a.m14 * b.m41;
-	out.m12 = a.m11 * b.m12 + a.m12 * b.m22 + a.m13 * b.m32 + a.m14 * b.m42;
-	out.m13 = a.m11 * b.m13 + a.m12 * b.m23 + a.m13 * b.m33 + a.m14 * b.m43;
-	out.m14 = a.m11 * b.m14 + a.m12 * b.m24 + a.m13 * b.m34 + a.m14 * b.m44;
-
-	out.m21 = a.m21 * b.m11 + a.m22 * b.m21 + a.m23 * b.m31 + a.m24 * b.m41;
-	out.m22 = a.m21 * b.m12 + a.m22 * b.m22 + a.m23 * b.m32 + a.m24 * b.m42;
-	out.m23 = a.m21 * b.m13 + a.m22 * b.m23 + a.m23 * b.m33 + a.m24 * b.m43;
-	out.m24 = a.m21 * b.m14 + a.m22 * b.m24 + a.m23 * b.m34 + a.m24 * b.m44;
-
-	out.m31 = a.m31 * b.m11 + a.m32 * b.m21 + a.m33 * b.m31 + a.m34 * b.m41;
-	out.m32 = a.m31 * b.m12 + a.m32 * b.m22 + a.m33 * b.m32 + a.m34 * b.m42;
-	out.m33 = a.m31 * b.m13 + a.m32 * b.m23 + a.m33 * b.m33 + a.m34 * b.m43;
-	out.m34 = a.m31 * b.m14 + a.m32 * b.m24 + a.m33 * b.m34 + a.m34 * b.m44;
-
-	out.m41 = a.m41 * b.m11 + a.m42 * b.m21 + a.m43 * b.m31 + a.m44 * b.m41;
-	out.m42 = a.m41 * b.m12 + a.m42 * b.m22 + a.m43 * b.m32 + a.m44 * b.m42;
-	out.m43 = a.m41 * b.m13 + a.m42 * b.m23 + a.m43 * b.m33 + a.m44 * b.m43;
-	out.m44 = a.m41 * b.m14 + a.m42 * b.m24 + a.m43 * b.m34 + a.m44 * b.m44;
-}
-
 Matrix4& MakeRotationMatrixX( Matrix4& out, float angle )
 {
 	ZeroMemory(&out, sizeof(Matrix4));
 
-	float sine = sin(angle * 3.14f / 180.0f);
-	float cosine = cos(angle * 3.14f / 180.0f);
+	float radian = TO_RADIAN(angle);
+	float sine = sin(radian);
+	float cosine = cos(radian);
 
 	out.m11 = 1.0f;
 	out.m22 = cosine;
 	out.m23 = sine;
 	out.m32 = -sine;
 	out.m33 = cosine;
+	out.m44 = 1.0f;
+
+	return out;
+}
+
+Matrix4& MakeRotationMatrixY( Matrix4& out, float angle )
+{
+	ZeroMemory(&out, sizeof(Matrix4));
+
+	float radian = TO_RADIAN(angle);
+	float sine = sin(radian);
+	float cosine = cos(radian);
+
+	out.m11 = cosine;
+	out.m13 = -sine;
+	out.m22 = 1.0f;
+	out.m31 = sine;
+	out.m33 = cosine;
+	out.m44 = 1.0f;
+
+	return out;
+}
+
+Matrix4& MakeRotationMatrixZ( Matrix4& out, float angle )
+{
+	ZeroMemory(&out, sizeof(Matrix4));
+
+	float radian = TO_RADIAN(angle);
+	float sine = sin(radian);
+	float cosine = cos(radian);
+
+	out.m11 = cosine;
+	out.m12 = sine;
+	out.m21 = -sine;
+	out.m22 = cosine;
+	out.m33 = 1.0f;
 	out.m44 = 1.0f;
 
 	return out;

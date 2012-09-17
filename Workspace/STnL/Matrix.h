@@ -36,8 +36,12 @@ public:
 	float m41, m42, m43, m44;
 };
 
-Matrix4& MakeRotationMatrixX(Matrix4& out, float angle);
-Matrix4& MakeProjectionMatrix(Matrix4& out, float zn, float zf, float fov, float aspect);
 void MatrixMultiply(Matrix4& out, const Matrix4& a, const Matrix4& b);
+
+Matrix4& MakeRotationMatrixX(Matrix4& out, float angle);
+Matrix4& MakeRotationMatrixY(Matrix4& out, float angle);
+Matrix4& MakeRotationMatrixZ(Matrix4& out, float angle);
+
+Matrix4& MakeProjectionMatrix(Matrix4& out, float zn, float zf, float fov, float aspect);
 
 #endif // Matrix_h__

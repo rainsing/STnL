@@ -46,6 +46,9 @@ void Application::Initialize( HWND hWnd, int windowWidth, int windowHeight )
 	SceneObject* object = new SceneObject(mesh, NULL);
 	m_sceneObjectList.push_back(object);
 
+	// 把cube往远处挪一点
+	object->m_worldMatrix.m43 = 5.0f;
+
 	m_initialized = true;
 }
 
@@ -91,12 +94,7 @@ void Application::Update( void )
 	SceneObject* object = m_sceneObjectList[0];
 
 	// 让cube转一下儿
-	static float rotation = 0.0f;
-	object->LocalRotate(rotation, 0.0f, 0.0f);
-	rotation += 0.05f;
-
-	// 把cube往远处挪一点
-	object->m_worldMatrix.m43 = 5.0f;
+	object->LocalRotate(0.02f, 0.05f, 0.0f);
 }
 
 void Application::Render( void )

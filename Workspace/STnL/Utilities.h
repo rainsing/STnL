@@ -12,7 +12,17 @@
 #ifndef Utilities_h__
 #define Utilities_h__
 
+#define PI 3.141592653f
+
 // 交换两个整数的值
-void swap(int& a, int& b);
+inline void swap(int& a, int& b)
+{
+	int temp = a;
+	a = b;
+	b = temp;
+}
+
+// 角度转弧度
+#define TO_RADIAN(a) (a * PI / 180.0f)
 
 #endif // Utilities_h__
