@@ -12,7 +12,12 @@
 #ifndef Renderer_h__
 #define Renderer_h__
 
+#include <vector>
+
 class BackBuffer;
+class RenderUnit;
+
+typedef std::vector<RenderUnit*> RenderUnitList;
 
 class Renderer
 {
@@ -20,12 +25,14 @@ public:
 	Renderer(void);
 
 	void SetRenderTarget(BackBuffer* renderTarget);
+	void AddRenderUnit(RenderUnit* renderUnit);
 	void Render(void);
 
 	void DrawLine(int x0, int y0, int x1, int y1, Color color);
 
 private:
 	BackBuffer* m_renderTarget;
+	RenderUnitList m_renderUnitList;
 };
 
 #endif // Renderer_h__

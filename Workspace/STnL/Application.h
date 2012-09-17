@@ -13,8 +13,14 @@
 #ifndef Application_h__
 #define Application_h__
 
+#include <vector>
+
 class BackBuffer;
 class Renderer;
+class SceneObject;
+class MeshManager;
+
+typedef std::vector<SceneObject*> SceneObjectList;
 
 class Application
 {
@@ -34,6 +40,8 @@ private:
 
 	BackBuffer* m_backBuffer;
 	Renderer* m_renderer;
+	SceneObjectList m_sceneObjectList;
+	MeshManager* m_meshManager;
 };
 
 #endif // Application_h__

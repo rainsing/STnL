@@ -49,39 +49,41 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 
 	hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_STNL));
 
-	// 应用程序初始化
-	Application application;
-	application.Initialize(hWnd, nWindowWidth, nWindowHeight);
-
-	// ---------------------------------
-
-	// 主循环
-	while (true)
 	{
-		// 处理Windows消息
-		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+		// 应用程序初始化
+		Application application;
+		application.Initialize(hWnd, nWindowWidth, nWindowHeight);
+
+		// ---------------------------------
+
+		// 主循环
+		while (true)
 		{
-			if (msg.message == WM_QUIT)
+			// 处理Windows消息
+			if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 			{
-				break;
+				if (msg.message == WM_QUIT)
+				{
+					break;
+				}
+
+				if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
+				{
+					TranslateMessage(&msg);
+					DispatchMessage(&msg);
+				}
 			}
 
-			if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
-			{
-				TranslateMessage(&msg);
-				DispatchMessage(&msg);
-			}
+			// 应用程序更新和渲染
+			application.Update();
+			application.Render();
 		}
 
-		// 应用程序更新和渲染
-		application.Update();
-		application.Render();
+		// ---------------------------------
+
+		// 应用程序销毁
+		application.Destroy();
 	}
-
-	// ---------------------------------
-
-	// 应用程序销毁
-	application.Destroy();
 
 #ifdef _DEBUG
 	_CrtDumpMemoryLeaks();

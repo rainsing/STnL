@@ -27,6 +27,8 @@ public:
 	void Clear(void);	// 快速clear至全黑
 	void Present(void);
 	inline void SetPixel(int x, int y, Color color);
+	inline int GetWidth(void);
+	inline int GetHeight(void);
 
 private:
 
@@ -43,6 +45,16 @@ private:
 void BackBuffer::SetPixel( int x, int y, Color color )
 {
 	*(m_colorData + y * m_width + x) = color;
+}
+
+int BackBuffer::GetWidth( void )
+{
+	return m_width;
+}
+
+int BackBuffer::GetHeight( void )
+{
+	return m_height;
 }
 
 #endif // BackBuffer_h__

@@ -225,11 +225,67 @@
 			>
 		</File>
 		<File
+			RelativePath=".\IndexBuffer.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\IndexBuffer.h"
+			>
+		</File>
+		<File
+			RelativePath=".\Material.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\Material.h"
+			>
+		</File>
+		<File
+			RelativePath=".\Matrix.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\Matrix.h"
+			>
+		</File>
+		<File
+			RelativePath=".\Mesh.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\Mesh.h"
+			>
+		</File>
+		<File
+			RelativePath=".\MeshManager.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\MeshManager.h"
+			>
+		</File>
+		<File
 			RelativePath=".\Renderer.cpp"
 			>
 		</File>
 		<File
 			RelativePath=".\Renderer.h"
+			>
+		</File>
+		<File
+			RelativePath=".\RenderUnit.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\RenderUnit.h"
+			>
+		</File>
+		<File
+			RelativePath=".\SceneObject.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\SceneObject.h"
 			>
 		</File>
 		<File
@@ -274,6 +330,38 @@
 		</File>
 		<File
 			RelativePath=".\Utilities.h"
+			>
+		</File>
+		<File
+			RelativePath=".\Vector.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\Vector.h"
+			>
+		</File>
+		<File
+			RelativePath=".\Vertex.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\Vertex.h"
+			>
+		</File>
+		<File
+			RelativePath=".\VertexBuffer.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\VertexBuffer.h"
+			>
+		</File>
+		<File
+			RelativePath=".\VertexShader.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\VertexShader.h"
 			>
 		</File>
 	</Files>
