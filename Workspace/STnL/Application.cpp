@@ -13,6 +13,7 @@
 #include "stdafx.h"
 #include "Application.h"
 
+#include "InputCapturer.h"
 #include "VertexShader.h"
 #include "Mesh.h"
 #include "RenderUnit.h"
@@ -26,9 +27,14 @@
 Application::Application( void )
 {
 	m_initialized = false;
+
+	m_nTicks = 0;
+	m_nTicksPerSecond = 0;
+
 	m_backBuffer = NULL;
 	m_renderer = NULL;
 	m_meshManager = NULL;
+	m_inputCapturer = NULL;
 }
 
 Application::~Application()
@@ -38,9 +44,18 @@ Application::~Application()
 
 void Application::Initialize( HWND hWnd, int windowWidth, int windowHeight )
 {
+	LARGE_INTEGER freq;
+	QueryPerformanceFrequency(&freq);
+	m_nTicksPerSecond = freq.QuadPart;
+
+	LARGE_INTEGER counter;
+	QueryPerformanceCounter(&counter);
+	m_nTicks = counter.QuadPart;
+
 	m_backBuffer = new BackBuffer(hWnd, windowWidth, windowHeight);
 	m_renderer = new Renderer();
 	m_meshManager = new MeshManager();
+	m_inputCapturer = new InputCapturer();
 	
 	Mesh* mesh = m_meshManager->LoadFromFile("cube");
 	SceneObject* object = new SceneObject(mesh, NULL);
@@ -63,6 +78,12 @@ void Application::Destroy( void )
 	{
 		delete m_sceneObjectList[i];
 		m_sceneObjectList[i] = NULL;
+	}
+
+	if (m_inputCapturer)
+	{
+		delete m_inputCapturer;
+		m_inputCapturer = NULL;
 	}
 
 	if (m_meshManager)
@@ -91,10 +112,45 @@ void Application::Update( void )
 		return;
 	}
 
+	// 计算delta T
+	LARGE_INTEGER counter;
+	QueryPerformanceCounter(&counter);
+	float dt = static_cast<float>((counter.QuadPart - m_nTicks) / double(m_nTicksPerSecond));
+	m_nTicks = counter.QuadPart;
+
+	// 控制物体旋转
+	// --begin--
 	SceneObject* object = m_sceneObjectList[0];
 
-	// 让cube转一下儿
-	object->LocalRotate(0.02f, 0.05f, 0.0f);
+	float rotationX = 0.0f;
+	float rotationY = 0.0f;
+	float rotationAmount = 90.0f * dt;
+
+	if (m_inputCapturer->IsKeyDown(KC_UP_ARROW) && !m_inputCapturer->IsKeyDown(KC_DOWN_ARROW))
+	{
+		rotationX = rotationAmount;
+	}
+	else if (!m_inputCapturer->IsKeyDown(KC_UP_ARROW) && m_inputCapturer->IsKeyDown(KC_DOWN_ARROW))
+	{
+		rotationX = -rotationAmount;
+	}
+
+	if (m_inputCapturer->IsKeyDown(KC_LEFT_ARROW) && !m_inputCapturer->IsKeyDown(KC_RIGHT_ARROW))
+	{
+		rotationY = rotationAmount;
+	}
+	else if (!m_inputCapturer->IsKeyDown(KC_LEFT_ARROW) && m_inputCapturer->IsKeyDown(KC_RIGHT_ARROW))
+	{
+		rotationY = -rotationAmount;
+	}
+
+	if (rotationX != 0.0f || rotationY != 0.0f)
+	{
+		object->LocalRotate(rotationX, rotationY, 0.0f);
+	}
+
+	// 控制物体旋转
+	// --end--
 }
 
 void Application::Render( void )

@@ -19,6 +19,7 @@ class BackBuffer;
 class Renderer;
 class SceneObject;
 class MeshManager;
+class InputCapturer;
 
 typedef std::vector<SceneObject*> SceneObjectList;
 
@@ -38,10 +39,14 @@ private:
 
 	bool m_initialized;
 
+	long long m_nTicks;
+	long long m_nTicksPerSecond;
+
 	BackBuffer* m_backBuffer;
 	Renderer* m_renderer;
 	SceneObjectList m_sceneObjectList;
 	MeshManager* m_meshManager;
+	InputCapturer* m_inputCapturer;
 };
 
 #endif // Application_h__
