@@ -232,6 +232,26 @@
 				>
 			</File>
 		</Filter>
+		<Filter
+			Name="Third Party"
+			>
+			<File
+				RelativePath=".\ObjMeshLoader.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\ObjMeshLoader.h"
+				>
+			</File>
+		</Filter>
 		<File
 			RelativePath=".\Application.cpp"
 			>
