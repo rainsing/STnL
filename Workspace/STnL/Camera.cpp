@@ -14,7 +14,7 @@
 
 Camera::Camera(float aspect)
 {
-	m_position = Vector3(0.0f, 0.0f, -5.0f);
+	m_position = Vector3(0.0f, 30.0f, -50.0f);
 	m_lookAt = Vector3::ZERO;
 	m_up = Vector3(0.0f, 1.0f, 0.0f);
 	m_nearClipDistance = 0.1f;

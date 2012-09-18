@@ -60,7 +60,7 @@ void Application::Initialize( HWND hWnd, int windowWidth, int windowHeight )
 	m_inputCapturer = new InputCapturer();
 	m_activeCamera = new Camera(float(windowWidth) / windowHeight);
 	
-	Mesh* mesh = m_meshManager->LoadFromFile("cube");
+	Mesh* mesh = m_meshManager->LoadFromFile("..\\Media\\teapot.mesh");
 	SceneObject* object = new SceneObject(mesh, NULL);
 	m_sceneObjectList.push_back(object);
 
@@ -140,7 +140,7 @@ void Application::Update( void )
 	float offsetX = 0.0f;
 	float offsetY = 0.0f;
 	float offsetZ = 0.0f;
-	float offsetAmount = 2.0f * dt;
+	float offsetAmount = 10.0f * dt;
 
 	if (m_inputCapturer->IsKeyDown(KC_A) && !m_inputCapturer->IsKeyDown(KC_D))
 	{

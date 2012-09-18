@@ -45,21 +45,21 @@ struct Vector3f{
     float x, y, z;
 };
 
-struct ObjMeshVertex{
-    Vector3f pos;
-    Vector2f texcoord;
-    Vector3f normal;
-};
+//struct ObjMeshVertex{
+//    Vector3f pos;
+//    Vector2f texcoord;
+//    Vector3f normal;
+//};
 
 /* This is a triangle, that we can render */
-struct ObjMeshFace{
-    ObjMeshVertex vertices[3];
-};
+//struct ObjMeshFace{
+//    ObjMeshVertex vertices[3];
+//};
 
 /* This contains a list of triangles */
-struct ObjMesh{
-    std::vector<ObjMeshFace> faces;
-};
+//struct ObjMesh{
+//    std::vector<ObjMeshFace> faces;
+//};
 
 /* Internal structure */
 struct _ObjMeshFaceIndex{
@@ -69,8 +69,9 @@ struct _ObjMeshFaceIndex{
 };
 
 /* Call this function to load a model, only loads triangulated meshes */
-void LoadObjMesh(std::string filename, Mesh* mesh){
-    ObjMesh myMesh;
+void LoadObjMesh(std::string filename, Mesh* mesh)
+{
+    //ObjMesh myMesh;
 
     std::vector<Vector3f>           positions;
     std::vector<Vector2f>           texcoords;
@@ -132,15 +133,16 @@ void LoadObjMesh(std::string filename, Mesh* mesh){
 		vb[i].position.z = positions[i].z;
 	}
 	
-	unsigned nIndices = 
 	IndexBuffer& ib = *(mesh->GetIndexBuffer());
-	ib.Initialize(nVerts);
+	ib.Initialize(faces.size() * 3);
 
-	for (unsigned i = 0; i < nVerts; i++)
+	unsigned j = 0;
+	for (unsigned i = 0; i < faces.size(); i++)
 	{
-		vb[i].position.x = positions[i].x;
-		vb[i].position.y = positions[i].y;
-		vb[i].position.z = positions[i].z;
+		ib[j + 0] = faces[i].pos_index[0] - 1;
+		ib[j + 1] = faces[i].pos_index[1] - 1;
+		ib[j + 2] = faces[i].pos_index[2] - 1;
+		j += 3;
 	}
 
     /*for(size_t i = 0; i < faces.size(); ++i){
