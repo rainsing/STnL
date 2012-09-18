@@ -17,7 +17,13 @@ enum KeyCode
 	KC_LEFT_ARROW,
 	KC_RIGHT_ARROW,
 	KC_UP_ARROW,
-	KC_DOWN_ARROW
+	KC_DOWN_ARROW,
+	KC_A,
+	KC_S,
+	KC_D,
+	KC_W,
+	KC_F,
+	KC_R,
 };
 
 class InputCapturer

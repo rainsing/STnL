@@ -16,7 +16,7 @@
 
 #include <math.h>
 
-Matrix4 Matrix4::IDENTITY(	1.0f, 0.0f, 0.0f, 0.0f,
+const Matrix4 Matrix4::IDENTITY(	1.0f, 0.0f, 0.0f, 0.0f,
 							0.0f, 1.0f, 0.0f, 0.0f,
 							0.0f, 0.0f, 1.0f, 0.0f,
 							0.0f, 0.0f, 0.0f, 1.0f);
@@ -76,11 +76,19 @@ void MatrixMultiply( Matrix4& out, const Matrix4& a, const Matrix4& b )
 	out = temp;
 }
 
+void MatrixTranspose( Matrix4& out, const Matrix4& a )
+{
+	out.m11 = a.m11; out.m12 = a.m21; out.m13 = a.m31; out.m14 = a.m41;
+	out.m21 = a.m12; out.m22 = a.m22; out.m23 = a.m32; out.m24 = a.m42;
+	out.m31 = a.m13; out.m32 = a.m23; out.m33 = a.m33; out.m34 = a.m43;
+	out.m41 = a.m14; out.m42 = a.m24; out.m43 = a.m34; out.m44 = a.m44;
+}
+
 Matrix4& MakeProjectionMatrix( Matrix4& out, float zn, float zf, float fov, float aspect )
 {
 	ZeroMemory(&out, sizeof(Matrix4));
 
-	float yScale = 1.0f / tan(fov / 2.0f);
+	float yScale = 1.0f / tan(TO_RADIAN(fov) / 2.0f);
 	float xScale = yScale / aspect;
 	float zScale = zf / (zf - zn);
 

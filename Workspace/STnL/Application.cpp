@@ -13,6 +13,7 @@
 #include "stdafx.h"
 #include "Application.h"
 
+#include "Camera.h"
 #include "InputCapturer.h"
 #include "VertexShader.h"
 #include "Mesh.h"
@@ -35,6 +36,7 @@ Application::Application( void )
 	m_renderer = NULL;
 	m_meshManager = NULL;
 	m_inputCapturer = NULL;
+	m_activeCamera = NULL;
 }
 
 Application::~Application()
@@ -56,13 +58,11 @@ void Application::Initialize( HWND hWnd, int windowWidth, int windowHeight )
 	m_renderer = new Renderer();
 	m_meshManager = new MeshManager();
 	m_inputCapturer = new InputCapturer();
+	m_activeCamera = new Camera(float(windowWidth) / windowHeight);
 	
 	Mesh* mesh = m_meshManager->LoadFromFile("cube");
 	SceneObject* object = new SceneObject(mesh, NULL);
 	m_sceneObjectList.push_back(object);
-
-	// 把cube往远处挪一点
-	object->m_worldMatrix.m43 = 5.0f;
 
 	m_initialized = true;
 }
@@ -80,29 +80,11 @@ void Application::Destroy( void )
 		m_sceneObjectList[i] = NULL;
 	}
 
-	if (m_inputCapturer)
-	{
-		delete m_inputCapturer;
-		m_inputCapturer = NULL;
-	}
-
-	if (m_meshManager)
-	{
-		delete m_meshManager;
-		m_meshManager = NULL;
-	}
-
-	if (m_renderer)
-	{
-		delete m_renderer;
-		m_renderer = NULL;
-	}
-
-	if (m_backBuffer)
-	{
-		delete m_backBuffer;
-		m_backBuffer = NULL;
-	}
+	SAFE_DELETE(m_activeCamera);
+	SAFE_DELETE(m_inputCapturer);
+	SAFE_DELETE(m_meshManager);
+	SAFE_DELETE(m_renderer);
+	SAFE_DELETE(m_backBuffer);
 }
 
 void Application::Update( void )
@@ -151,6 +133,49 @@ void Application::Update( void )
 
 	// 控制物体旋转
 	// --end--
+
+	// 控制摄像机移动
+	// --begin--
+
+	float offsetX = 0.0f;
+	float offsetY = 0.0f;
+	float offsetZ = 0.0f;
+	float offsetAmount = 2.0f * dt;
+
+	if (m_inputCapturer->IsKeyDown(KC_A) && !m_inputCapturer->IsKeyDown(KC_D))
+	{
+		offsetX = -offsetAmount;
+	}
+	else if (!m_inputCapturer->IsKeyDown(KC_A) && m_inputCapturer->IsKeyDown(KC_D))
+	{
+		offsetX = offsetAmount;
+	}
+
+	if (m_inputCapturer->IsKeyDown(KC_F) && !m_inputCapturer->IsKeyDown(KC_R))
+	{
+		offsetY = -offsetAmount;
+	}
+	else if (!m_inputCapturer->IsKeyDown(KC_F) && m_inputCapturer->IsKeyDown(KC_R))
+	{
+		offsetY = offsetAmount;
+	}
+
+	if (m_inputCapturer->IsKeyDown(KC_W) && !m_inputCapturer->IsKeyDown(KC_S))
+	{
+		offsetZ = offsetAmount;
+	}
+	else if (!m_inputCapturer->IsKeyDown(KC_W) && m_inputCapturer->IsKeyDown(KC_S))
+	{
+		offsetZ = -offsetAmount;
+	}
+
+	if (offsetX != 0.0f || offsetY != 0.0f || offsetZ != 0.0f)
+	{
+		m_activeCamera->LocalMove(offsetX, offsetY, offsetZ);
+	}
+
+	// 控制摄像机移动
+	// --end--
 }
 
 void Application::Render( void )
@@ -171,9 +196,8 @@ void Application::Render( void )
 		MyVertexShader* myVS = new MyVertexShader();
 		renderUnit->m_vs = myVS;
 
-		Matrix4 projMatrix;
-		MakeProjectionMatrix(projMatrix, 0.1f, 15.0f, 45.0f * 3.14f / 180.0f, 1.33f);
-		MatrixMultiply(myVS->worldViewProjMatrix, object->m_worldMatrix, projMatrix);
+		MatrixMultiply(myVS->worldViewProjMatrix, object->m_worldMatrix, m_activeCamera->GetViewMatrix());
+		MatrixMultiply(myVS->worldViewProjMatrix, myVS->worldViewProjMatrix, m_activeCamera->GetProjMatrix());
 
 		m_renderer->AddRenderUnit(renderUnit);
 	}

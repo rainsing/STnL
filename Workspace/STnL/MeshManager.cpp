@@ -48,21 +48,21 @@ Mesh* MeshManager::LoadFromFile( const char* fileName )
 	mesh->m_vb[3].position.y = -1.0f;
 	mesh->m_vb[3].position.z =  1.0f;
 
-	mesh->m_vb[4].position.x = -1.0f;
+	mesh->m_vb[4].position.x = -1.0f / 2;
 	mesh->m_vb[4].position.y =  1.0f;
-	mesh->m_vb[4].position.z = -1.0f;
+	mesh->m_vb[4].position.z = -1.0f / 2;
 
-	mesh->m_vb[5].position.x =  1.0f;
+	mesh->m_vb[5].position.x =  1.0f / 2;
 	mesh->m_vb[5].position.y =  1.0f;
-	mesh->m_vb[5].position.z = -1.0f;
+	mesh->m_vb[5].position.z = -1.0f / 2;
 
-	mesh->m_vb[6].position.x =  1.0f;
+	mesh->m_vb[6].position.x =  1.0f / 2;
 	mesh->m_vb[6].position.y =  1.0f;
-	mesh->m_vb[6].position.z =  1.0f;
+	mesh->m_vb[6].position.z =  1.0f / 2;
 
-	mesh->m_vb[7].position.x = -1.0f;
+	mesh->m_vb[7].position.x = -1.0f / 2;
 	mesh->m_vb[7].position.y =  1.0f;
-	mesh->m_vb[7].position.z =  1.0f;
+	mesh->m_vb[7].position.z =  1.0f / 2;
 
 	mesh->m_ib.Initialize(36);
 

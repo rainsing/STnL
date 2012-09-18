@@ -25,4 +25,19 @@ inline void swap(int& a, int& b)
 // ½Ç¶È×ª»¡¶È
 #define TO_RADIAN(a) (a * PI / 180.0f)
 
+// Safe delete
+#define SAFE_DELETE(x) \
+	if (x) \
+	{ \
+		delete x; \
+		x = NULL; \
+	}
+
+#define SAFE_VECTOR_DELETE(x) \
+	if (x) \
+	{ \
+		delete[] x; \
+		x = NULL; \
+	}
+
 #endif // Utilities_h__

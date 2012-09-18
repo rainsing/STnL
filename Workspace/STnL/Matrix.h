@@ -28,7 +28,7 @@ public:
 
 	Vector4 Transform(const Vector4& vec);
 
-	static Matrix4 IDENTITY;
+	static const Matrix4 IDENTITY;
 
 	float m11, m12, m13, m14;
 	float m21, m22, m23, m24;
@@ -37,6 +37,7 @@ public:
 };
 
 void MatrixMultiply(Matrix4& out, const Matrix4& a, const Matrix4& b);
+void MatrixTranspose(Matrix4& out, const Matrix4& a);
 
 Matrix4& MakeRotationMatrixX(Matrix4& out, float angle);
 Matrix4& MakeRotationMatrixY(Matrix4& out, float angle);

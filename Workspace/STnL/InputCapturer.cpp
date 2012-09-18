@@ -33,6 +33,30 @@ bool InputCapturer::IsKeyDown( KeyCode keyCode )
 		virtKey = VK_RIGHT;
 		break;
 
+	case KC_A:
+		virtKey = 'A';
+		break;
+
+	case KC_S:
+		virtKey = 'S';
+		break;
+
+	case KC_D:
+		virtKey = 'D';
+		break;
+
+	case KC_W:
+		virtKey = 'W';
+		break;
+
+	case KC_F:
+		virtKey = 'F';
+		break;
+
+	case KC_R:
+		virtKey = 'R';
+		break;
+
 	default:
 		return false;
 	}

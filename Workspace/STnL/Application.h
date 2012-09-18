@@ -20,6 +20,7 @@ class Renderer;
 class SceneObject;
 class MeshManager;
 class InputCapturer;
+class Camera;
 
 typedef std::vector<SceneObject*> SceneObjectList;
 
@@ -47,6 +48,7 @@ private:
 	SceneObjectList m_sceneObjectList;
 	MeshManager* m_meshManager;
 	InputCapturer* m_inputCapturer;
+	Camera* m_activeCamera;
 };
 
 #endif // Application_h__
