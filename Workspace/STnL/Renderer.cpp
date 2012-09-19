@@ -93,6 +93,10 @@ void Renderer::Render( void )
 			{
 				continue;
 			}
+			else if (RemoveBackface(tri, vsOuts, CULL_MODE_CCW))
+			{
+				continue;
+			}
 			else if (TrivialAccept(tri, vsOuts))
 			{
 				triangles.push_back(tri);
@@ -237,4 +241,43 @@ bool Renderer::TrivialAccept( Triangle& triangle, VsOutList& vsOuts )
 		v2.clipPos.z >= 0.0f && v2.clipPos.z <= v2.clipPos.w;
 
 	return v0InFrustum && v1InFrustum && v2InFrustum;
+}
+
+bool Renderer::RemoveBackface( Triangle& triangle, VsOutList& vsOuts, CullMode cullMode )
+{
+	if (cullMode == CULL_MODE_NONE)
+	{
+		return false;
+	}
+
+	VertexShaderOutput& v0 = vsOuts[triangle.iV0];
+	VertexShaderOutput& v1 = vsOuts[triangle.iV1];
+	VertexShaderOutput& v2 = vsOuts[triangle.iV2];
+
+	Vector3 e1;
+	e1.x = v1.clipPos.x / v1.clipPos.w - v0.clipPos.x / v0.clipPos.w;
+	e1.y = v1.clipPos.y / v1.clipPos.w - v0.clipPos.y / v0.clipPos.w;
+	e1.z = v1.clipPos.z / v1.clipPos.w - v0.clipPos.z / v0.clipPos.w;
+
+	Vector3 e2;
+	e2.x = v2.clipPos.x / v2.clipPos.w - v0.clipPos.x / v0.clipPos.w;
+	e2.y = v2.clipPos.y / v2.clipPos.w - v0.clipPos.y / v0.clipPos.w;
+	e2.z = v2.clipPos.z / v2.clipPos.w - v0.clipPos.z / v0.clipPos.w;
+
+	Vector3 faceNormal = e1.Cross(e2);
+
+	// 顺带在这儿移除所有的退化三角形
+	if (faceNormal.Equal(Vector3::ZERO, 0.0001f))
+	{
+		return true;
+	}
+
+	if (cullMode == CULL_MODE_CCW)
+	{
+		return faceNormal.z > 0;
+	}
+	else
+	{
+		return faceNormal.z < 0;
+	}
 }

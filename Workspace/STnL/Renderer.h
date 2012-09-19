@@ -32,6 +32,13 @@ class Renderer
 	typedef std::vector<VertexShaderOutput> VsOutList;
 	typedef std::vector<Triangle> TriangleList;
 
+	enum CullMode
+	{
+		CULL_MODE_CW,
+		CULL_MODE_CCW,
+		CULL_MODE_NONE
+	};
+
 public:
 	Renderer(void);
 
@@ -44,6 +51,7 @@ public:
 private:
 	bool TrivialReject(Triangle& triangle, VsOutList& vsOuts);
 	bool TrivialAccept(Triangle& triangle, VsOutList& vsOuts);
+	bool RemoveBackface(Triangle& triangle, VsOutList& vsOuts, CullMode cullMode);
 
 private:
 	BackBuffer* m_renderTarget;

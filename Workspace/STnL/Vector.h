@@ -25,6 +25,7 @@ public:
 	inline void Normalize(void);
 	inline float Dot(Vector3& rhs) const;
 	inline Vector3 Cross(Vector3& rhs) const;
+	inline bool Equal(const Vector3& rhs, float tolerance);
 
 	static const Vector3 ZERO;
 
@@ -72,6 +73,11 @@ Vector3 Vector3::Cross( Vector3& rhs ) const
 	out.z = x * rhs.y - y * rhs.x;
 
 	return out;
+}
+
+bool Vector3::Equal( const Vector3& rhs, float tolerance )
+{
+	return fabs(x - rhs.x) < tolerance && fabs(y - rhs.y) < tolerance && fabs(z - rhs.z) < tolerance;
 }
 
 // -------------------------------------------------
