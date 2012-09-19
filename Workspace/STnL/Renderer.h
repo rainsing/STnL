@@ -12,15 +12,26 @@
 #ifndef Renderer_h__
 #define Renderer_h__
 
+#include "VertexShader.h"
+
 #include <vector>
 
 class BackBuffer;
 class RenderUnit;
 
-typedef std::vector<RenderUnit*> RenderUnitList;
-
 class Renderer
 {
+	struct Triangle
+	{
+		unsigned short iV0;
+		unsigned short iV1;
+		unsigned short iV2;
+	};
+
+	typedef std::vector<RenderUnit*> RenderUnitList;
+	typedef std::vector<VertexShaderOutput> VsOutList;
+	typedef std::vector<Triangle> TriangleList;
+
 public:
 	Renderer(void);
 
@@ -29,6 +40,10 @@ public:
 	void Render(void);
 
 	void DrawLine(int x0, int y0, int x1, int y1, Color color);
+
+private:
+	bool TrivialReject(Triangle& triangle, VsOutList& vsOuts);
+	bool TrivialAccept(Triangle& triangle, VsOutList& vsOuts);
 
 private:
 	BackBuffer* m_renderTarget;

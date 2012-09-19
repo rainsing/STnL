@@ -44,6 +44,12 @@ private:
 
 void BackBuffer::SetPixel( int x, int y, Color color )
 {
+	// TODO: This won't be needed any more after clipping is implemented.
+	if (x < 0 || x >= m_width || y < 0 || y >= m_height)
+	{
+		return;
+	}
+
 	*(m_colorData + y * m_width + x) = color;
 }
 

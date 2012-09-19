@@ -70,37 +70,74 @@ void Renderer::Render( void )
 		RenderUnit* renderUnit = m_renderUnitList[i];
 
 		unsigned nVerts = renderUnit->m_vb->Size();
-		VertexShaderOutput* vsOuts = new VertexShaderOutput[nVerts];
+		unsigned nTriangles = renderUnit->m_ib->Size() / 3;
 
+		VsOutList vsOuts(nVerts);
+		TriangleList triangles;
+
+		// 对每个顶点执行VS
 		for (unsigned j = 0; j < nVerts; j++)
 		{
 			vsOuts[j] = renderUnit->m_vs->Main((*renderUnit->m_vb)[j]);
-
-			// perspective-divide
-			Vector4& clipSpacePosition = vsOuts[j].clipSpacePosition;
-			clipSpacePosition.x /= clipSpacePosition.w; 
-			clipSpacePosition.y /= clipSpacePosition.w;
-			clipSpacePosition.z /= clipSpacePosition.w;
 		}
 
-		unsigned nTriangles = renderUnit->m_ib->Size() / 3;
+		// triangle setup (trivial-rejection, clipping)
 		for (unsigned j = 0; j < nTriangles; j++)
 		{
-			int x0 = (int)(( vsOuts[(*renderUnit->m_ib)[3 * j + 0]].clipSpacePosition.x + 1.0f) * (m_renderTarget->GetWidth() >> 1));
-			int y0 = (int)((-vsOuts[(*renderUnit->m_ib)[3 * j + 0]].clipSpacePosition.y + 1.0f) * (m_renderTarget->GetHeight() >> 1));
+			Triangle tri;
+			tri.iV0 = (*renderUnit->m_ib)[3 * j + 0];
+			tri.iV1 = (*renderUnit->m_ib)[3 * j + 1];
+			tri.iV2 = (*renderUnit->m_ib)[3 * j + 2];
 
-			int x1 = (int)(( vsOuts[(*renderUnit->m_ib)[3 * j + 1]].clipSpacePosition.x + 1.0f) * (m_renderTarget->GetWidth() >> 1));
-			int y1 = (int)((-vsOuts[(*renderUnit->m_ib)[3 * j + 1]].clipSpacePosition.y + 1.0f) * (m_renderTarget->GetHeight() >> 1));
-
-			int x2 = (int)(( vsOuts[(*renderUnit->m_ib)[3 * j + 2]].clipSpacePosition.x + 1.0f) * (m_renderTarget->GetWidth() >> 1));
-			int y2 = (int)((-vsOuts[(*renderUnit->m_ib)[3 * j + 2]].clipSpacePosition.y + 1.0f) * (m_renderTarget->GetHeight() >> 1));
-
-			DrawLine(x0, y0, x1, y1, COLOR_RGB(255, 255, 255));
-			DrawLine(x0, y0, x2, y2, COLOR_RGB(255, 255, 255));
-			DrawLine(x1, y1, x2, y2, COLOR_RGB(255, 255, 255));
+			if (TrivialReject(tri, vsOuts))
+			{
+				continue;
+			}
+			else if (TrivialAccept(tri, vsOuts))
+			{
+				triangles.push_back(tri);
+			}
+			else
+			{
+				// TODO: do clipping here
+				triangles.push_back(tri);
+			}
 		}
 
-		delete[] vsOuts;
+		// perspective-divide
+		for (unsigned j = 0; j < vsOuts.size(); j++)
+		{
+			Vector4& clipPos = vsOuts[j].clipPos;
+
+			clipPos.x /= clipPos.w; 
+			clipPos.y /= clipPos.w;
+			clipPos.z /= clipPos.w;
+		}
+		
+		// 光栅化每个三角形
+		int halfRtWidth = m_renderTarget->GetWidth() >> 1;
+		int halfRtHeight = m_renderTarget->GetHeight() >> 1;
+
+		for (unsigned j = 0; j < triangles.size(); j++)
+		{
+			VertexShaderOutput& v0 = vsOuts[triangles[j].iV0];
+			VertexShaderOutput& v1 = vsOuts[triangles[j].iV1];
+			VertexShaderOutput& v2 = vsOuts[triangles[j].iV2];
+
+			int x0 = int(( v0.clipPos.x + 1.0f) * halfRtWidth);
+			int y0 = int((-v0.clipPos.y + 1.0f) * halfRtHeight);
+
+			int x1 = int(( v1.clipPos.x + 1.0f) * halfRtWidth);
+			int y1 = int((-v1.clipPos.y + 1.0f) * halfRtHeight);
+
+			int x2 = int(( v2.clipPos.x + 1.0f) * halfRtWidth);
+			int y2 = int((-v2.clipPos.y + 1.0f) * halfRtHeight);
+			
+			DrawLine(x0, y0, x1, y1, 0xFFFFFFFF);
+			DrawLine(x0, y0, x2, y2, 0xFFFFFFFF);
+			DrawLine(x1, y1, x2, y2, 0xFFFFFFFF);
+		}
+
 		delete renderUnit;
 	}
 
@@ -110,4 +147,94 @@ void Renderer::Render( void )
 void Renderer::AddRenderUnit( RenderUnit* renderUnit )
 {
 	m_renderUnitList.push_back(renderUnit);
+}
+
+bool Renderer::TrivialReject( Triangle& triangle, VsOutList& vsOuts )
+{
+	VertexShaderOutput& v0 = vsOuts[triangle.iV0];
+	VertexShaderOutput& v1 = vsOuts[triangle.iV1];
+	VertexShaderOutput& v2 = vsOuts[triangle.iV2];
+
+	// test against x = -w plane
+	if (v0.clipPos.x < -v0.clipPos.w && 
+		v1.clipPos.x < -v1.clipPos.w && 
+		v2.clipPos.x < -v2.clipPos.w)
+	{
+		return true;
+	}
+
+	// test against x = w plane
+	if (v0.clipPos.x > v0.clipPos.w &&
+		v1.clipPos.x > v1.clipPos.w &&
+		v2.clipPos.x > v2.clipPos.w)
+	{
+		return true;
+	}
+
+	// test against y = -w plane
+	if (v0.clipPos.y < -v0.clipPos.w && 
+		v1.clipPos.y < -v1.clipPos.w && 
+		v2.clipPos.y < -v2.clipPos.w)
+	{
+		return true;
+	}
+
+	// test against y = w plane
+	if (v0.clipPos.y > v0.clipPos.w &&
+		v1.clipPos.y > v1.clipPos.w &&
+		v2.clipPos.y > v2.clipPos.w)
+	{
+		return true;
+	}
+
+	// test against z = 0 plane
+	if (v0.clipPos.z < 0 && 
+		v1.clipPos.z < 0 && 
+		v2.clipPos.z < 0)
+	{
+		return true;
+	}
+
+	// test against z = w plane
+	if (v0.clipPos.z > v0.clipPos.w &&
+		v1.clipPos.z > v1.clipPos.w &&
+		v2.clipPos.z > v2.clipPos.w)
+	{
+		return true;
+	}
+
+	// 避免渲染在摄像机后面的三角形
+	// TODO: clipping to the Near plane to get rid of this
+	if (v0.clipPos.z < 0.0f || 
+		v1.clipPos.z < 0.0f || 
+		v2.clipPos.z < 0.0f)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool Renderer::TrivialAccept( Triangle& triangle, VsOutList& vsOuts )
+{
+	VertexShaderOutput& v0 = vsOuts[triangle.iV0];
+	VertexShaderOutput& v1 = vsOuts[triangle.iV1];
+	VertexShaderOutput& v2 = vsOuts[triangle.iV2];
+
+	bool v0InFrustum = 
+		v0.clipPos.x >= -v0.clipPos.w && v0.clipPos.x <= v0.clipPos.w &&
+		v0.clipPos.y >= -v0.clipPos.w && v0.clipPos.y <= v0.clipPos.w &&
+		v0.clipPos.z >= 0.0f && v0.clipPos.z <= v0.clipPos.w;
+
+	bool v1InFrustum = 
+		v1.clipPos.x >= -v1.clipPos.w && v1.clipPos.x <= v1.clipPos.w &&
+		v1.clipPos.y >= -v1.clipPos.w && v1.clipPos.y <= v1.clipPos.w &&
+		v1.clipPos.z >= 0.0f && v1.clipPos.z <= v1.clipPos.w;
+
+	bool v2InFrustum = 
+		v2.clipPos.x >= -v2.clipPos.w && v2.clipPos.x <= v2.clipPos.w &&
+		v2.clipPos.y >= -v2.clipPos.w && v2.clipPos.y <= v2.clipPos.w &&
+		v2.clipPos.z >= 0.0f && v2.clipPos.z <= v2.clipPos.w;
+
+	return v0InFrustum && v1InFrustum && v2InFrustum;
 }
