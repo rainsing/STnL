@@ -21,6 +21,14 @@ class RenderUnit;
 
 class Renderer
 {
+public:
+	Renderer(void);
+
+	void SetRenderTarget(BackBuffer* renderTarget);
+	void AddRenderUnit(RenderUnit* renderUnit);
+	void Render(void);
+
+private:
 	struct Triangle
 	{
 		unsigned short iV0;
@@ -39,19 +47,11 @@ class Renderer
 		CULL_MODE_NONE
 	};
 
-public:
-	Renderer(void);
-
-	void SetRenderTarget(BackBuffer* renderTarget);
-	void AddRenderUnit(RenderUnit* renderUnit);
-	void Render(void);
-
-	void DrawLine(int x0, int y0, int x1, int y1, Color color);
-
 private:
 	bool TrivialReject(Triangle& triangle, VsOutList& vsOuts);
 	bool TrivialAccept(Triangle& triangle, VsOutList& vsOuts);
 	bool RemoveBackface(Triangle& triangle, VsOutList& vsOuts, CullMode cullMode);
+	void DrawLine(int x0, int y0, int x1, int y1, Color color);
 
 private:
 	BackBuffer* m_renderTarget;

@@ -186,6 +186,10 @@ void Renderer::Render( void )
 				}
 
 				// 扫描线算法
+				// --begin--
+
+				// 这种fill convention会导致由两个三角形共享的边上的像素被重绘一次，而顶点所在的像素会重绘更多次。
+				// 但是算法实现简单，而且保证没有漏洞（漏洞比重绘更致命）
 				int minY = int(sv->position.y);
 				int maxY = int(ev->position.y);
 				int midY = int(mv->position.y);
@@ -195,23 +199,28 @@ void Renderer::Render( void )
 				float dx2 = (mv->position.x - sv->position.x) / (mv->position.y - sv->position.y);	
 				float dx2Alt = (ev->position.x - mv->position.x) / (ev->position.y - mv->position.y);
 
+				// flat shading color = 三顶点光照颜色的平均值
+				char r = static_cast<char>((v0.atrribute0.x + v1.atrribute0.x + v2.atrribute0.x) / 3.0f * 255.0f);
+				char g = static_cast<char>((v0.atrribute0.y + v1.atrribute0.y + v2.atrribute0.y) / 3.0f * 255.0f);
+				char b = static_cast<char>((v0.atrribute0.z + v1.atrribute0.z + v2.atrribute0.z) / 3.0f * 255.0f);
+
 				for (int y = minY; y < maxY; y++)
 				{
 					if (y == midY)
 					{
-						x2 = mv->position.x;
 						dx2 = dx2Alt;
+						x2 = mv->position.x;
 					}
 
-					float cx = (v0.atrribute0.x + v1.atrribute0.x + v2.atrribute0.x) / 3.0f;
-					float cy = (v0.atrribute0.y + v1.atrribute0.y + v2.atrribute0.y) / 3.0f;
-					float cz = (v0.atrribute0.z + v1.atrribute0.z + v2.atrribute0.z) / 3.0f;
-
-					DrawLine(int(x1), y, int(x2), y, COLOR_RGB(cx * 255.0f, cy * 255.0f, cz * 255.0f));
+					// TODO: 临时用直线算法填充扫描线
+					DrawLine(int(x1), y, int(x2), y, COLOR_RGB(r, g, b));
 
 					x1 += dx1;
 					x2 += dx2;
 				}
+
+				// 扫描线算法
+				// --end--
 			}
 		}
 
