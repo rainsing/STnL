@@ -108,38 +108,102 @@ void Renderer::Render( void )
 			}
 		}
 
-		// perspective-divide
-		for (unsigned j = 0; j < vsOuts.size(); j++)
-		{
-			Vector4& clipPos = vsOuts[j].clipPos;
-
-			clipPos.x /= clipPos.w; 
-			clipPos.y /= clipPos.w;
-			clipPos.z /= clipPos.w;
-		}
-		
-		// 光栅化每个三角形
 		int halfRtWidth = m_renderTarget->GetWidth() >> 1;
 		int halfRtHeight = m_renderTarget->GetHeight() >> 1;
 
+		for (unsigned j = 0; j < vsOuts.size(); j++)
+		{
+			Vector4& position = vsOuts[j].position;
+
+			// perspective-divide
+			position.x /= position.w; 
+			position.y /= position.w;
+			position.z /= position.w;
+
+			// 转化到屏幕坐标
+			position.x = ( position.x + 1.0f) * halfRtWidth;
+			position.y = (-position.y + 1.0f) * halfRtHeight;
+		}
+		
+		// 光栅化每个三角形
 		for (unsigned j = 0; j < triangles.size(); j++)
 		{
 			VertexShaderOutput& v0 = vsOuts[triangles[j].iV0];
 			VertexShaderOutput& v1 = vsOuts[triangles[j].iV1];
 			VertexShaderOutput& v2 = vsOuts[triangles[j].iV2];
 
-			int x0 = int(( v0.clipPos.x + 1.0f) * halfRtWidth);
-			int y0 = int((-v0.clipPos.y + 1.0f) * halfRtHeight);
+			bool wireFrameMode = false;
 
-			int x1 = int(( v1.clipPos.x + 1.0f) * halfRtWidth);
-			int y1 = int((-v1.clipPos.y + 1.0f) * halfRtHeight);
+			if (wireFrameMode)	// fill mode: wireframe
+			{
+				int x0 = int(v0.position.x);
+				int y0 = int(v0.position.y);
+				int x1 = int(v1.position.x);
+				int y1 = int(v1.position.y);
+				int x2 = int(v2.position.x);
+				int y2 = int(v2.position.y);
 
-			int x2 = int(( v2.clipPos.x + 1.0f) * halfRtWidth);
-			int y2 = int((-v2.clipPos.y + 1.0f) * halfRtHeight);
-			
-			DrawLine(x0, y0, x1, y1, 0xFFFFFFFF);
-			DrawLine(x0, y0, x2, y2, 0xFFFFFFFF);
-			DrawLine(x1, y1, x2, y2, 0xFFFFFFFF);
+				DrawLine(x0, y0, x1, y1, 0xFFFFFFFF);
+				DrawLine(x0, y0, x2, y2, 0xFFFFFFFF);
+				DrawLine(x1, y1, x2, y2, 0xFFFFFFFF);
+			}
+			else	// fill mode: solid
+			{
+				VertexShaderOutput* sv;
+				VertexShaderOutput* mv;
+				VertexShaderOutput* ev;
+				
+				// 按Y值给三个顶点排序
+				if (v0.position.y < v1.position.y)
+				{
+					sv = &v0;
+					ev = &v1;
+				}
+				else
+				{
+					sv = &v1;
+					ev = &v0;
+				}
+
+				if (v2.position.y < sv->position.y)
+				{
+					mv = sv;
+					sv = &v2;
+				}
+				else if (v2.position.y > ev->position.y)
+				{
+					mv = ev;
+					ev = &v2;
+				}
+				else
+				{
+					mv = &v2;
+				}
+
+				// 扫描线算法
+				int minY = int(sv->position.y);
+				int maxY = int(ev->position.y);
+				int midY = int(mv->position.y);
+				float x1 = sv->position.x;
+				float x2 = sv->position.x;
+				float dx1 = (ev->position.x - sv->position.x) / (ev->position.y - sv->position.y);
+				float dx2 = (mv->position.x - sv->position.x) / (mv->position.y - sv->position.y);	
+				float dx2Alt = (ev->position.x - mv->position.x) / (ev->position.y - mv->position.y);
+
+				for (int y = minY; y < maxY; y++)
+				{
+					if (y == midY)
+					{
+						x2 = mv->position.x;
+						dx2 = dx2Alt;
+					}
+
+					DrawLine(int(x1), y, int(x2), y, COLOR_RGB(sv->position.x / 640.0f * 255, 0, 0));
+
+					x1 += dx1;
+					x2 += dx2;
+				}
+			}
 		}
 
 		delete renderUnit;
@@ -160,58 +224,58 @@ bool Renderer::TrivialReject( Triangle& triangle, VsOutList& vsOuts )
 	VertexShaderOutput& v2 = vsOuts[triangle.iV2];
 
 	// test against x = -w plane
-	if (v0.clipPos.x < -v0.clipPos.w && 
-		v1.clipPos.x < -v1.clipPos.w && 
-		v2.clipPos.x < -v2.clipPos.w)
+	if (v0.position.x < -v0.position.w && 
+		v1.position.x < -v1.position.w && 
+		v2.position.x < -v2.position.w)
 	{
 		return true;
 	}
 
 	// test against x = w plane
-	if (v0.clipPos.x > v0.clipPos.w &&
-		v1.clipPos.x > v1.clipPos.w &&
-		v2.clipPos.x > v2.clipPos.w)
+	if (v0.position.x > v0.position.w &&
+		v1.position.x > v1.position.w &&
+		v2.position.x > v2.position.w)
 	{
 		return true;
 	}
 
 	// test against y = -w plane
-	if (v0.clipPos.y < -v0.clipPos.w && 
-		v1.clipPos.y < -v1.clipPos.w && 
-		v2.clipPos.y < -v2.clipPos.w)
+	if (v0.position.y < -v0.position.w && 
+		v1.position.y < -v1.position.w && 
+		v2.position.y < -v2.position.w)
 	{
 		return true;
 	}
 
 	// test against y = w plane
-	if (v0.clipPos.y > v0.clipPos.w &&
-		v1.clipPos.y > v1.clipPos.w &&
-		v2.clipPos.y > v2.clipPos.w)
+	if (v0.position.y > v0.position.w &&
+		v1.position.y > v1.position.w &&
+		v2.position.y > v2.position.w)
 	{
 		return true;
 	}
 
 	// test against z = 0 plane
-	if (v0.clipPos.z < 0 && 
-		v1.clipPos.z < 0 && 
-		v2.clipPos.z < 0)
+	if (v0.position.z < 0 && 
+		v1.position.z < 0 && 
+		v2.position.z < 0)
 	{
 		return true;
 	}
 
 	// test against z = w plane
-	if (v0.clipPos.z > v0.clipPos.w &&
-		v1.clipPos.z > v1.clipPos.w &&
-		v2.clipPos.z > v2.clipPos.w)
+	if (v0.position.z > v0.position.w &&
+		v1.position.z > v1.position.w &&
+		v2.position.z > v2.position.w)
 	{
 		return true;
 	}
 
 	// 避免渲染在摄像机后面的三角形
 	// TODO: clipping to the Near plane to get rid of this
-	if (v0.clipPos.z < 0.0f || 
-		v1.clipPos.z < 0.0f || 
-		v2.clipPos.z < 0.0f)
+	if (v0.position.z < 0.0f || 
+		v1.position.z < 0.0f || 
+		v2.position.z < 0.0f)
 	{
 		return true;
 	}
@@ -226,19 +290,19 @@ bool Renderer::TrivialAccept( Triangle& triangle, VsOutList& vsOuts )
 	VertexShaderOutput& v2 = vsOuts[triangle.iV2];
 
 	bool v0InFrustum = 
-		v0.clipPos.x >= -v0.clipPos.w && v0.clipPos.x <= v0.clipPos.w &&
-		v0.clipPos.y >= -v0.clipPos.w && v0.clipPos.y <= v0.clipPos.w &&
-		v0.clipPos.z >= 0.0f && v0.clipPos.z <= v0.clipPos.w;
+		v0.position.x >= -v0.position.w && v0.position.x <= v0.position.w &&
+		v0.position.y >= -v0.position.w && v0.position.y <= v0.position.w &&
+		v0.position.z >= 0.0f && v0.position.z <= v0.position.w;
 
 	bool v1InFrustum = 
-		v1.clipPos.x >= -v1.clipPos.w && v1.clipPos.x <= v1.clipPos.w &&
-		v1.clipPos.y >= -v1.clipPos.w && v1.clipPos.y <= v1.clipPos.w &&
-		v1.clipPos.z >= 0.0f && v1.clipPos.z <= v1.clipPos.w;
+		v1.position.x >= -v1.position.w && v1.position.x <= v1.position.w &&
+		v1.position.y >= -v1.position.w && v1.position.y <= v1.position.w &&
+		v1.position.z >= 0.0f && v1.position.z <= v1.position.w;
 
 	bool v2InFrustum = 
-		v2.clipPos.x >= -v2.clipPos.w && v2.clipPos.x <= v2.clipPos.w &&
-		v2.clipPos.y >= -v2.clipPos.w && v2.clipPos.y <= v2.clipPos.w &&
-		v2.clipPos.z >= 0.0f && v2.clipPos.z <= v2.clipPos.w;
+		v2.position.x >= -v2.position.w && v2.position.x <= v2.position.w &&
+		v2.position.y >= -v2.position.w && v2.position.y <= v2.position.w &&
+		v2.position.z >= 0.0f && v2.position.z <= v2.position.w;
 
 	return v0InFrustum && v1InFrustum && v2InFrustum;
 }
@@ -255,14 +319,14 @@ bool Renderer::RemoveBackface( Triangle& triangle, VsOutList& vsOuts, CullMode c
 	VertexShaderOutput& v2 = vsOuts[triangle.iV2];
 
 	Vector3 e1;
-	e1.x = v1.clipPos.x / v1.clipPos.w - v0.clipPos.x / v0.clipPos.w;
-	e1.y = v1.clipPos.y / v1.clipPos.w - v0.clipPos.y / v0.clipPos.w;
-	e1.z = v1.clipPos.z / v1.clipPos.w - v0.clipPos.z / v0.clipPos.w;
+	e1.x = v1.position.x / v1.position.w - v0.position.x / v0.position.w;
+	e1.y = v1.position.y / v1.position.w - v0.position.y / v0.position.w;
+	e1.z = v1.position.z / v1.position.w - v0.position.z / v0.position.w;
 
 	Vector3 e2;
-	e2.x = v2.clipPos.x / v2.clipPos.w - v0.clipPos.x / v0.clipPos.w;
-	e2.y = v2.clipPos.y / v2.clipPos.w - v0.clipPos.y / v0.clipPos.w;
-	e2.z = v2.clipPos.z / v2.clipPos.w - v0.clipPos.z / v0.clipPos.w;
+	e2.x = v2.position.x / v2.position.w - v0.position.x / v0.position.w;
+	e2.y = v2.position.y / v2.position.w - v0.position.y / v0.position.w;
+	e2.z = v2.position.z / v2.position.w - v0.position.z / v0.position.w;
 
 	Vector3 faceNormal = e1.Cross(e2);
 

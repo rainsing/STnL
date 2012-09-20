@@ -23,7 +23,7 @@ VertexShaderOutput MyVertexShader::Main( const Vertex& vertex )
 {
 	VertexShaderOutput output;
 
-	output.clipPos = worldViewProjMatrix.Transform(vertex.position);
+	output.position = worldViewProjMatrix.Transform(vertex.position);
 
 	return output;
 }

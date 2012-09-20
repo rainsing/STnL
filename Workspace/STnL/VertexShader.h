@@ -23,7 +23,7 @@ public:
 	VertexShaderOutput(void);
 
 public:
-	Vector4 clipPos;
+	Vector4 position;
 };
 
 class VertexShader
