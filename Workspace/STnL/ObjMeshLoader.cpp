@@ -142,6 +142,19 @@ void LoadObjMesh(std::string filename, Mesh* mesh)
 		ib[j + 0] = faces[i].pos_index[0] - 1;
 		ib[j + 1] = faces[i].pos_index[1] - 1;
 		ib[j + 2] = faces[i].pos_index[2] - 1;
+
+		vb[ib[j + 0]].normal.x = normals[faces[i].nor_index[0] - 1].x;
+		vb[ib[j + 0]].normal.y = normals[faces[i].nor_index[0] - 1].y;
+		vb[ib[j + 0]].normal.z = normals[faces[i].nor_index[0] - 1].z;
+
+		vb[ib[j + 1]].normal.x = normals[faces[i].nor_index[1] - 1].x;
+		vb[ib[j + 1]].normal.y = normals[faces[i].nor_index[1] - 1].y;
+		vb[ib[j + 1]].normal.z = normals[faces[i].nor_index[1] - 1].z;
+
+		vb[ib[j + 2]].normal.x = normals[faces[i].nor_index[2] - 1].x;
+		vb[ib[j + 2]].normal.y = normals[faces[i].nor_index[2] - 1].y;
+		vb[ib[j + 2]].normal.z = normals[faces[i].nor_index[2] - 1].z;
+
 		j += 3;
 	}
 

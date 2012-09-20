@@ -132,6 +132,11 @@ void Renderer::Render( void )
 			VertexShaderOutput& v1 = vsOuts[triangles[j].iV1];
 			VertexShaderOutput& v2 = vsOuts[triangles[j].iV2];
 
+			/*if (j != 256)
+			{
+				continue;
+			}*/
+
 			bool wireFrameMode = false;
 
 			if (wireFrameMode)	// fill mode: wireframe
@@ -198,7 +203,11 @@ void Renderer::Render( void )
 						dx2 = dx2Alt;
 					}
 
-					DrawLine(int(x1), y, int(x2), y, COLOR_RGB(sv->position.x / 640.0f * 255, 0, 0));
+					float cx = (v0.atrribute0.x + v1.atrribute0.x + v2.atrribute0.x) / 3.0f;
+					float cy = (v0.atrribute0.y + v1.atrribute0.y + v2.atrribute0.y) / 3.0f;
+					float cz = (v0.atrribute0.z + v1.atrribute0.z + v2.atrribute0.z) / 3.0f;
+
+					DrawLine(int(x1), y, int(x2), y, COLOR_RGB(cx * 255.0f, cy * 255.0f, cz * 255.0f));
 
 					x1 += dx1;
 					x2 += dx2;

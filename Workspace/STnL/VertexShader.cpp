@@ -25,5 +25,19 @@ VertexShaderOutput MyVertexShader::Main( const Vertex& vertex )
 
 	output.position = worldViewProjMatrix.Transform(vertex.position);
 
+	Vector4 worldSpaceNormal = worldMatrix.Transform(vertex.normal);
+
+	Vector3 worldSpaceNormal3;
+	worldSpaceNormal3.x = worldSpaceNormal.x;
+	worldSpaceNormal3.y = worldSpaceNormal.y;
+	worldSpaceNormal3.z = worldSpaceNormal.z;
+
+	float angle = worldSpaceNormal3.Dot(Vector3(0.0f, 1.0f, 0.0f));
+	if (angle < 0.0f)
+	{
+		angle = 0.0f;
+	}
+	output.atrribute0 = Vector3(1.0f, 1.0f, 1.0f) * angle;
+
 	return output;
 }

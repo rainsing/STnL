@@ -21,6 +21,9 @@ public:
 	inline Vector3(float _x, float _y, float _z);
 
 	inline Vector3 operator -(Vector3& rhs) const;
+	inline Vector3 operator +(float f) const;
+	inline Vector3 operator +(Vector3& rhs) const;
+	inline Vector3 operator *(float f) const;
 
 	inline void Normalize(void);
 	inline float Dot(Vector3& rhs) const;
@@ -49,6 +52,25 @@ Vector3::Vector3(float _x, float _y, float _z)
 Vector3 Vector3::operator-( Vector3& rhs ) const
 {
 	return Vector3(x - rhs.x , y - rhs.y, z - rhs.z);
+}
+
+Vector3 Vector3::operator+( Vector3& rhs ) const
+{
+	return Vector3(x + rhs.x , y + rhs.y, z + rhs.z);
+}
+
+Vector3 Vector3::operator+( float f ) const
+{
+	return Vector3(x + f , y + f, z + f);
+}
+
+Vector3 Vector3::operator*( float f ) const
+{
+	Vector3 out;
+	out.x = x * f;
+	out.y = y * f;
+	out.z = z * f;
+	return out;
 }
 
 void Vector3::Normalize( void )

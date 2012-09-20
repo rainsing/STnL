@@ -196,6 +196,8 @@ void Application::Render( void )
 		MyVertexShader* myVS = new MyVertexShader();
 		renderUnit->m_vs = myVS;
 
+		myVS->worldMatrix = object->m_worldMatrix;
+
 		MatrixMultiply(myVS->worldViewProjMatrix, object->m_worldMatrix, m_activeCamera->GetViewMatrix());
 		MatrixMultiply(myVS->worldViewProjMatrix, myVS->worldViewProjMatrix, m_activeCamera->GetProjMatrix());
 

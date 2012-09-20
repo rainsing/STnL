@@ -18,6 +18,7 @@ class Vertex
 {
 public:
 	Vector3 position;
+	Vector3 normal;
 };
 
 #endif // Vertex_h__

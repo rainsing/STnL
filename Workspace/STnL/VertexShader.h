@@ -24,6 +24,7 @@ public:
 
 public:
 	Vector4 position;
+	Vector4 atrribute0;
 };
 
 class VertexShader
@@ -38,6 +39,7 @@ public:
 	virtual VertexShaderOutput Main(const Vertex& vertex);
 
 public:
+	Matrix4 worldMatrix;
 	Matrix4 worldViewProjMatrix;
 };
 
