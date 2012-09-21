@@ -193,16 +193,20 @@ void Renderer::Render( void )
 				int minY = int(sv->position.y);
 				int maxY = int(ev->position.y);
 				int midY = int(mv->position.y);
+
+				float esY = ev->position.y - sv->position.y;
+				float msY = mv->position.y - sv->position.y;
+				float emY = ev->position.y - mv->position.y;
+
+				float subPixelYOffsetS = sv->position.y - int(sv->position.y);
+				float subPixelYOffsetM = mv->position.y - int(mv->position.y);
+
+				float dx1 = (ev->position.x - sv->position.x) / esY;
+				float dx2 = (mv->position.x - sv->position.x) / msY;	
+				float dx2Alt = (ev->position.x - mv->position.x) / emY;
+
 				float x1 = sv->position.x;
 				float x2 = sv->position.x;
-				float dx1 = (ev->position.x - sv->position.x) / (ev->position.y - sv->position.y);
-				float dx2 = (mv->position.x - sv->position.x) / (mv->position.y - sv->position.y);	
-				float dx2Alt = (ev->position.x - mv->position.x) / (ev->position.y - mv->position.y);
-
-				// flat shading color = 三顶点光照颜色的平均值
-				char r = static_cast<char>((v0.atrribute0.x + v1.atrribute0.x + v2.atrribute0.x) / 3.0f * 255.0f);
-				char g = static_cast<char>((v0.atrribute0.y + v1.atrribute0.y + v2.atrribute0.y) / 3.0f * 255.0f);
-				char b = static_cast<char>((v0.atrribute0.z + v1.atrribute0.z + v2.atrribute0.z) / 3.0f * 255.0f);
 
 				for (int y = minY; y < maxY; y++)
 				{
@@ -212,8 +216,22 @@ void Renderer::Render( void )
 						x2 = mv->position.x;
 					}
 
-					// TODO: 临时用直线算法填充扫描线
-					DrawLine(int(x1), y, int(x2), y, COLOR_RGB(r, g, b));
+					float fY = y < midY ? y + subPixelYOffsetS : y + subPixelYOffsetM;
+
+					VertexShaderOutput& va1 = Lerp(*sv, *ev, (ev->position.y - fY) / esY);
+
+					VertexShaderOutput& va2 = y < midY
+						? Lerp(*sv, *mv, (mv->position.y - fY) / msY)
+						: Lerp(*mv, *ev, (ev->position.y - fY) / emY);
+
+					if (x1 < x2)
+					{
+						FillSpan(x1, x2, y, va1, va2);
+					}
+					else
+					{
+						FillSpan(x2, x1, y, va2, va1);
+					}
 
 					x1 += dx1;
 					x2 += dx2;
@@ -361,5 +379,27 @@ bool Renderer::RemoveBackface( Triangle& triangle, VsOutList& vsOuts, CullMode c
 	else
 	{
 		return faceNormal.z < 0;
+	}
+}
+
+void Renderer::FillSpan( float x0, float x1, int y, VertexShaderOutput& va0, VertexShaderOutput& va1 )
+{
+	int startX = int(x0);
+	int endX = int(x1);
+	float len = x1 - x0;
+	float xt = x0;
+
+	for (int x = startX; x < endX; x++)
+	{
+		VertexShaderOutput& va = Lerp(va0, va1, (x1 - xt) / len);
+		
+		// TODO: should call the pixel shaders here...
+		float a = va.atrribute0.w * 255.0f;
+		float r = va.atrribute0.x * 255.0f;
+		float g = va.atrribute0.y * 255.0f;
+		float b = va.atrribute0.z * 255.0f;
+		m_renderTarget->SetPixel(x, y, COLOR_ARGB(a, r, g, b));
+
+		xt += 1.0f;
 	}
 }

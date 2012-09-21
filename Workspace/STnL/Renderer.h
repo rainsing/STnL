@@ -53,6 +53,10 @@ private:
 	bool RemoveBackface(Triangle& triangle, VsOutList& vsOuts, CullMode cullMode);
 	void DrawLine(int x0, int y0, int x1, int y1, Color color);
 
+	// 填充一条水平扫描线，线性插值两端点的顶点属性
+	// 要求保证x0 < x1
+	void FillSpan(float x0, float x1, int y, VertexShaderOutput& va0, VertexShaderOutput& va1);
+
 private:
 	BackBuffer* m_renderTarget;
 	RenderUnitList m_renderUnitList;

@@ -138,4 +138,7 @@ Vector4::Vector4( const Vector3& vec3 )
 	w = 1.0f;
 }
 
+Vector4 Lerp(Vector4& v0, Vector4& v1, float t);
+void Lerp(Vector4& out, Vector4& v0, Vector4& v1, float t);
+
 #endif // Vector_h__

@@ -27,6 +27,9 @@ public:
 	Vector4 atrribute0;
 };
 
+VertexShaderOutput Lerp(VertexShaderOutput& va0, VertexShaderOutput& va1, float t);
+void Lerp(VertexShaderOutput& out, VertexShaderOutput& va0, VertexShaderOutput& va1, float t);
+
 class VertexShader
 {
 public:

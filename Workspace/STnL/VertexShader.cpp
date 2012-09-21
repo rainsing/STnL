@@ -37,7 +37,21 @@ VertexShaderOutput MyVertexShader::Main( const Vertex& vertex )
 	{
 		angle = 0.0f;
 	}
-	output.atrribute0 = Vector3(1.0f, 1.0f, 1.0f) * angle;
+	output.atrribute0 = Vector3(0.0f, 1.0f, 0.0f) * angle;
 
 	return output;
+}
+
+VertexShaderOutput Lerp( VertexShaderOutput& va0, VertexShaderOutput& va1, float t )
+{
+	VertexShaderOutput out;
+	Lerp(out.position, va0.position, va1.position, t);
+	Lerp(out.atrribute0, va0.atrribute0, va1.atrribute0, t);
+	return out;
+}
+
+void Lerp( VertexShaderOutput& out, VertexShaderOutput& va0, VertexShaderOutput& va1, float t )
+{
+	 Lerp(out.position, va0.position, va1.position, t);
+	 Lerp(out.atrribute0, va0.atrribute0, va1.atrribute0, t);
 }
