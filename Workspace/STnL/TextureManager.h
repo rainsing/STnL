@@ -1,0 +1,33 @@
+/********************************************************************
+	created:	2012/09/21
+	created:	21:9:2012   16:21
+	filename: 	e:\GitHub\STnL\Workspace\STnL\TextureManager.h
+	file path:	e:\GitHub\STnL\Workspace\STnL
+	file base:	TextureManager
+	file ext:	h
+	author:		Rainsing
+	
+	purpose:	加载并管理纹理
+*********************************************************************/
+#ifndef TextureManager_h__
+#define TextureManager_h__
+
+#include <vector>
+
+class Texture;
+
+typedef std::vector<Texture*> TextureList;
+
+class TextureManager
+{
+public:
+	TextureManager(void);
+	~TextureManager();
+
+	Texture* LoadFromFile(const char* fileName);
+
+private:
+	TextureList m_textureList;
+};
+
+#endif // TextureManager_h__

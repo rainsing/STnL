@@ -41,6 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				AdditionalIncludeDirectories="&quot;..\3Party\DevIL-SDK-x86-1.7.8\include&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -61,8 +62,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="DevIL.lib"
 				OutputFile="$(OutDir)\$(ProjectName)_d.exe"
 				LinkIncremental="2"
+				AdditionalLibraryDirectories="&quot;..\3Party\DevIL-SDK-x86-1.7.8\lib&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="1"
@@ -87,6 +90,8 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				Description="Copy the DevIL DLL to the Output directory..."
+				CommandLine="copy &quot;..\3Party\DevIL-SDK-x86-1.7.8\lib\DevIL.dll&quot; $(OutDir)"
 			/>
 		</Configuration>
 		<Configuration
@@ -116,6 +121,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
+				AdditionalIncludeDirectories="&quot;..\3Party\DevIL-SDK-x86-1.7.8\include&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -135,7 +141,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="DevIL.lib"
 				LinkIncremental="1"
+				AdditionalLibraryDirectories="&quot;..\3Party\DevIL-SDK-x86-1.7.8\lib&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -162,6 +170,8 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				Description="Copy the DevIL DLL to the Output directory..."
+				CommandLine="copy &quot;..\3Party\DevIL-SDK-x86-1.7.8\lib\DevIL.dll&quot; $(OutDir)"
 			/>
 		</Configuration>
 	</Configurations>
@@ -354,6 +364,22 @@
 		</File>
 		<File
 			RelativePath=".\SceneObject.h"
+			>
+		</File>
+		<File
+			RelativePath=".\Texture.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\Texture.h"
+			>
+		</File>
+		<File
+			RelativePath=".\TextureManager.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\TextureManager.h"
 			>
 		</File>
 		<File

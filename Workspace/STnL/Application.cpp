@@ -20,6 +20,7 @@
 #include "RenderUnit.h"
 #include "SceneObject.h"
 #include "MeshManager.h"
+#include "TextureManager.h"
 #include "Renderer.h"
 #include "BackBuffer.h"
 #include "Utilities.h"
@@ -35,6 +36,7 @@ Application::Application( void )
 	m_backBuffer = NULL;
 	m_renderer = NULL;
 	m_meshManager = NULL;
+	m_textureManager = NULL;
 	m_inputCapturer = NULL;
 	m_activeCamera = NULL;
 }
@@ -57,10 +59,13 @@ void Application::Initialize( HWND hWnd, int windowWidth, int windowHeight )
 	m_backBuffer = new BackBuffer(hWnd, windowWidth, windowHeight);
 	m_renderer = new Renderer();
 	m_meshManager = new MeshManager();
+	m_textureManager = new TextureManager();
 	m_inputCapturer = new InputCapturer();
 	m_activeCamera = new Camera(float(windowWidth) / windowHeight);
 	
 	Mesh* mesh = m_meshManager->LoadFromFile("..\\Media\\teapot.mesh");
+	Texture* texture = m_textureManager->LoadFromFile("..\\Media\\texture.bmp");
+
 	SceneObject* object = new SceneObject(mesh, NULL);
 	m_sceneObjectList.push_back(object);
 
@@ -82,6 +87,7 @@ void Application::Destroy( void )
 
 	SAFE_DELETE(m_activeCamera);
 	SAFE_DELETE(m_inputCapturer);
+	SAFE_DELETE(m_textureManager);
 	SAFE_DELETE(m_meshManager);
 	SAFE_DELETE(m_renderer);
 	SAFE_DELETE(m_backBuffer);

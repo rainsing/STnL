@@ -19,6 +19,7 @@ class BackBuffer;
 class Renderer;
 class SceneObject;
 class MeshManager;
+class TextureManager;
 class InputCapturer;
 class Camera;
 
@@ -47,6 +48,7 @@ private:
 	Renderer* m_renderer;
 	SceneObjectList m_sceneObjectList;
 	MeshManager* m_meshManager;
+	TextureManager* m_textureManager;
 	InputCapturer* m_inputCapturer;
 	Camera* m_activeCamera;
 };
