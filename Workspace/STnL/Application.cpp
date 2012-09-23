@@ -13,6 +13,7 @@
 #include "stdafx.h"
 #include "Application.h"
 
+#include "TextOutput.h"
 #include "Camera.h"
 #include "InputCapturer.h"
 #include "VertexShader.h"
@@ -39,6 +40,7 @@ Application::Application( void )
 	m_textureManager = NULL;
 	m_inputCapturer = NULL;
 	m_activeCamera = NULL;
+	m_textOutput = NULL;
 }
 
 Application::~Application()
@@ -62,6 +64,7 @@ void Application::Initialize( HWND hWnd, int windowWidth, int windowHeight )
 	m_textureManager = new TextureManager();
 	m_inputCapturer = new InputCapturer();
 	m_activeCamera = new Camera(float(windowWidth) / windowHeight);
+	m_textOutput = new TextOutput(hWnd);
 	
 	Mesh* mesh = m_meshManager->LoadFromFile("..\\Media\\teapot.mesh");
 	Texture* texture = m_textureManager->LoadFromFile("..\\Media\\texture.bmp");
@@ -85,6 +88,7 @@ void Application::Destroy( void )
 		m_sceneObjectList[i] = NULL;
 	}
 
+	SAFE_DELETE(m_textOutput);
 	SAFE_DELETE(m_activeCamera);
 	SAFE_DELETE(m_inputCapturer);
 	SAFE_DELETE(m_textureManager);
@@ -106,6 +110,11 @@ void Application::Update( void )
 	float dt = static_cast<float>((counter.QuadPart - m_nTicks) / double(m_nTicksPerSecond));
 	m_nTicks = counter.QuadPart;
 
+	// 显示FPS
+	char str[256];
+	sprintf_s(str, 256, "FPS: %.1f", 1.0f / dt);
+	m_textOutput->Print(str, 5, 5);
+	
 	// 控制物体旋转
 	// --begin--
 	SceneObject* object = m_sceneObjectList[0];

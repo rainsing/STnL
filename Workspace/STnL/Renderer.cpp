@@ -384,21 +384,21 @@ bool Renderer::RemoveBackface( Triangle& triangle, VsOutList& vsOuts, CullMode c
 
 void Renderer::FillSpan( float x0, float x1, int y, VertexShaderOutput& va0, VertexShaderOutput& va1 )
 {
-	int startX = int(x0);
-	int endX = int(x1);
+	int startX = Float2Int(x0);
+	int endX = Float2Int(x1);
 	float len = x1 - x0;
 	float xt = x0;
 
+	VertexShaderOutput va;
 	for (int x = startX; x < endX; x++)
 	{
-		VertexShaderOutput& va = Lerp(va0, va1, (x1 - xt) / len);
+		Lerp(va, va0, va1, (x1 - xt) / len);
 		
 		// TODO: should call the pixel shaders here...
-		float a = va.atrribute0.w * 255.0f;
-		float r = va.atrribute0.x * 255.0f;
-		float g = va.atrribute0.y * 255.0f;
-		float b = va.atrribute0.z * 255.0f;
-		m_renderTarget->SetPixel(x, y, COLOR_ARGB(a, r, g, b));
+		int r = Float2Int(va.atrribute0.x * 255.0f);
+		int g = Float2Int(va.atrribute0.y * 255.0f);
+		int b = Float2Int(va.atrribute0.z * 255.0f);
+		m_renderTarget->SetPixel(x, y, COLOR_RGB(r, g, b));
 
 		xt += 1.0f;
 	}

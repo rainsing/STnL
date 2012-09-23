@@ -15,10 +15,6 @@
 #include "Texture.h"
 #include "Utilities.h"
 
-#ifdef _UNICODE
-	#undef _UNICODE
-#endif 
-
 #include "IL/il.h"
 
 TextureManager::TextureManager( void )

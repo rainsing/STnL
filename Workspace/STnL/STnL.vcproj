@@ -21,7 +21,7 @@
 			OutputDirectory="$(SolutionDir)\..\Output\"
 			IntermediateDirectory="..\Temp\$(ConfigurationName)"
 			ConfigurationType="1"
-			CharacterSet="1"
+			CharacterSet="0"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -91,7 +91,7 @@
 			<Tool
 				Name="VCPostBuildEventTool"
 				Description="Copy the DevIL DLL to the Output directory..."
-				CommandLine="copy &quot;..\3Party\DevIL-SDK-x86-1.7.8\lib\DevIL.dll&quot; $(OutDir)"
+				CommandLine="copy &quot;..\3Party\DevIL-SDK-x86-1.7.8\lib\DevIL.dll&quot; &quot;$(OutDir)&quot;"
 			/>
 		</Configuration>
 		<Configuration
@@ -99,7 +99,7 @@
 			OutputDirectory="$(SolutionDir)\..\Output\"
 			IntermediateDirectory="..\Temp\$(ConfigurationName)"
 			ConfigurationType="1"
-			CharacterSet="1"
+			CharacterSet="0"
 			WholeProgramOptimization="1"
 			>
 			<Tool
@@ -120,7 +120,9 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="2"
+				InlineFunctionExpansion="2"
 				EnableIntrinsicFunctions="true"
+				FavorSizeOrSpeed="1"
 				AdditionalIncludeDirectories="&quot;..\3Party\DevIL-SDK-x86-1.7.8\include&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
 				RuntimeLibrary="2"
@@ -171,7 +173,7 @@
 			<Tool
 				Name="VCPostBuildEventTool"
 				Description="Copy the DevIL DLL to the Output directory..."
-				CommandLine="copy &quot;..\3Party\DevIL-SDK-x86-1.7.8\lib\DevIL.dll&quot; $(OutDir)"
+				CommandLine="copy &quot;..\3Party\DevIL-SDK-x86-1.7.8\lib\DevIL.dll&quot; &quot;$(OutDir)&quot;"
 			/>
 		</Configuration>
 	</Configurations>
@@ -364,6 +366,14 @@
 		</File>
 		<File
 			RelativePath=".\SceneObject.h"
+			>
+		</File>
+		<File
+			RelativePath=".\TextOutput.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\TextOutput.h"
 			>
 		</File>
 		<File

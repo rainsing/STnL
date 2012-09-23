@@ -22,6 +22,7 @@ class MeshManager;
 class TextureManager;
 class InputCapturer;
 class Camera;
+class TextOutput;
 
 typedef std::vector<SceneObject*> SceneObjectList;
 
@@ -51,6 +52,7 @@ private:
 	TextureManager* m_textureManager;
 	InputCapturer* m_inputCapturer;
 	Camera* m_activeCamera;
+	TextOutput* m_textOutput;
 };
 
 #endif // Application_h__
