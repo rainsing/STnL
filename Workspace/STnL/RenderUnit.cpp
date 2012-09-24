@@ -12,20 +12,20 @@
 #include "stdafx.h"
 #include "RenderUnit.h"
 
+#include "PixelShader.h"
 #include "VertexShader.h"
+#include "Utilities.h"
 
 RenderUnit::RenderUnit( void )
 {
 	m_vb = NULL;
 	m_ib = NULL;
 	m_vs = NULL;
+	m_ps = NULL;
 }
 
 RenderUnit::~RenderUnit()
 {
-	if (m_vs)
-	{
-		delete m_vs;
-		m_vs = NULL;
-	}
+	SAFE_DELETE(m_ps);
+	SAFE_DELETE(m_vs);
 }

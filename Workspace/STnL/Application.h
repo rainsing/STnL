@@ -23,6 +23,7 @@ class TextureManager;
 class InputCapturer;
 class Camera;
 class TextOutput;
+class DepthBuffer;
 
 typedef std::vector<SceneObject*> SceneObjectList;
 
@@ -53,6 +54,7 @@ private:
 	InputCapturer* m_inputCapturer;
 	Camera* m_activeCamera;
 	TextOutput* m_textOutput;
+	DepthBuffer* m_depthBuffer;
 };
 
 #endif // Application_h__

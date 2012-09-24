@@ -12,8 +12,10 @@
 #include "stdafx.h"
 #include "Renderer.h"
 
+#include "DepthBuffer.h"
 #include "RenderUnit.h"
 #include "VertexShader.h"
+#include "PixelShader.h"
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
 #include "BackBuffer.h"
@@ -24,9 +26,10 @@ Renderer::Renderer( void )
 	m_renderTarget = NULL;
 }
 
-void Renderer::SetRenderTarget( BackBuffer* renderTarget )
+void Renderer::SetRenderTarget( BackBuffer* renderTarget, DepthBuffer* depthBuffer )
 {
 	m_renderTarget = renderTarget;
+	m_depthBuffer = depthBuffer;
 }
 
 void Renderer::DrawLine( int x0, int y0, int x1, int y1, Color color )
@@ -132,7 +135,7 @@ void Renderer::Render( void )
 			VertexShaderOutput& v1 = vsOuts[triangles[j].iV1];
 			VertexShaderOutput& v2 = vsOuts[triangles[j].iV2];
 
-			/*if (j != 256)
+			/*if (j != 105)
 			{
 				continue;
 			}*/
@@ -226,11 +229,11 @@ void Renderer::Render( void )
 
 					if (x1 < x2)
 					{
-						FillSpan(x1, x2, y, va1, va2);
+						FillSpan(x1, x2, y, va1, va2, *renderUnit->m_ps);
 					}
 					else
 					{
-						FillSpan(x2, x1, y, va2, va1);
+						FillSpan(x2, x1, y, va2, va1, *renderUnit->m_ps);
 					}
 
 					x1 += dx1;
@@ -382,7 +385,7 @@ bool Renderer::RemoveBackface( Triangle& triangle, VsOutList& vsOuts, CullMode c
 	}
 }
 
-void Renderer::FillSpan( float x0, float x1, int y, VertexShaderOutput& va0, VertexShaderOutput& va1 )
+void Renderer::FillSpan( float x0, float x1, int y, VertexShaderOutput& va0, VertexShaderOutput& va1, PixelShader& ps )
 {
 	int startX = Float2Int(x0);
 	int endX = Float2Int(x1);
@@ -392,14 +395,20 @@ void Renderer::FillSpan( float x0, float x1, int y, VertexShaderOutput& va0, Ver
 	VertexShaderOutput va;
 	for (int x = startX; x < endX; x++)
 	{
+		xt = float(x + 1);
 		Lerp(va, va0, va1, (x1 - xt) / len);
-		
-		// TODO: should call the pixel shaders here...
-		int r = Float2Int(va.atrribute0.x * 255.0f);
-		int g = Float2Int(va.atrribute0.y * 255.0f);
-		int b = Float2Int(va.atrribute0.z * 255.0f);
-		m_renderTarget->SetPixel(x, y, COLOR_RGB(r, g, b));
 
-		xt += 1.0f;
+		// early z-test (before executing pixel shader)
+		if (!m_depthBuffer->TestDepth(x, y, va.position.z))
+		{
+			continue;
+		}
+		
+		Vector4 color = ps.Main(va);
+
+		int r = Float2Int(color.x * 255.0f);
+		int g = Float2Int(color.y * 255.0f);
+		int b = Float2Int(color.z * 255.0f);
+		m_renderTarget->SetPixel(x, y, COLOR_RGB(r, g, b));
 	}
 }

@@ -14,6 +14,13 @@
 
 #include <math.h>
 
+class Vector2
+{
+public:
+	float x;
+	float y;
+};
+
 class Vector3
 {
 public:

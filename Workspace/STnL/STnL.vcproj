@@ -297,6 +297,14 @@
 			>
 		</File>
 		<File
+			RelativePath=".\DepthBuffer.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\DepthBuffer.h"
+			>
+		</File>
+		<File
 			RelativePath=".\IndexBuffer.cpp"
 			>
 		</File>
@@ -342,6 +350,14 @@
 		</File>
 		<File
 			RelativePath=".\MeshManager.h"
+			>
+		</File>
+		<File
+			RelativePath=".\PixelShader.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\PixelShader.h"
 			>
 		</File>
 		<File

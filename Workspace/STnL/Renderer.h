@@ -18,13 +18,15 @@
 
 class BackBuffer;
 class RenderUnit;
+class PixelShader;
+class DepthBuffer;
 
 class Renderer
 {
 public:
 	Renderer(void);
 
-	void SetRenderTarget(BackBuffer* renderTarget);
+	void SetRenderTarget(BackBuffer* renderTarget, DepthBuffer* depthBuffer);
 	void AddRenderUnit(RenderUnit* renderUnit);
 	void Render(void);
 
@@ -55,10 +57,11 @@ private:
 
 	// 填充一条水平扫描线，线性插值两端点的顶点属性
 	// 要求保证x0 < x1
-	void FillSpan(float x0, float x1, int y, VertexShaderOutput& va0, VertexShaderOutput& va1);
+	void FillSpan(float x0, float x1, int y, VertexShaderOutput& va0, VertexShaderOutput& va1, PixelShader& ps);
 
 private:
 	BackBuffer* m_renderTarget;
+	DepthBuffer* m_depthBuffer;
 	RenderUnitList m_renderUnitList;
 };
 

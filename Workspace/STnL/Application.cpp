@@ -13,10 +13,12 @@
 #include "stdafx.h"
 #include "Application.h"
 
+#include "DepthBuffer.h"
 #include "TextOutput.h"
 #include "Camera.h"
 #include "InputCapturer.h"
 #include "VertexShader.h"
+#include "PixelShader.h"
 #include "Mesh.h"
 #include "RenderUnit.h"
 #include "SceneObject.h"
@@ -41,6 +43,7 @@ Application::Application( void )
 	m_inputCapturer = NULL;
 	m_activeCamera = NULL;
 	m_textOutput = NULL;
+	m_depthBuffer = NULL;
 }
 
 Application::~Application()
@@ -65,9 +68,10 @@ void Application::Initialize( HWND hWnd, int windowWidth, int windowHeight )
 	m_inputCapturer = new InputCapturer();
 	m_activeCamera = new Camera(float(windowWidth) / windowHeight);
 	m_textOutput = new TextOutput(hWnd);
+	m_depthBuffer = new DepthBuffer(windowWidth, windowHeight);
 	
 	Mesh* mesh = m_meshManager->LoadFromFile("..\\Media\\teapot.mesh");
-	Texture* texture = m_textureManager->LoadFromFile("..\\Media\\texture.bmp");
+	Texture* texture = m_textureManager->LoadFromFile("..\\Media\\ripple.bmp");
 
 	SceneObject* object = new SceneObject(mesh, NULL);
 	m_sceneObjectList.push_back(object);
@@ -88,6 +92,7 @@ void Application::Destroy( void )
 		m_sceneObjectList[i] = NULL;
 	}
 
+	SAFE_DELETE(m_depthBuffer);
 	SAFE_DELETE(m_textOutput);
 	SAFE_DELETE(m_activeCamera);
 	SAFE_DELETE(m_inputCapturer);
@@ -216,12 +221,18 @@ void Application::Render( void )
 		MatrixMultiply(myVS->worldViewProjMatrix, object->m_worldMatrix, m_activeCamera->GetViewMatrix());
 		MatrixMultiply(myVS->worldViewProjMatrix, myVS->worldViewProjMatrix, m_activeCamera->GetProjMatrix());
 
+		MyPixelShader* myPS = new MyPixelShader();
+		renderUnit->m_ps = myPS;
+
+		myPS->baseTexture = m_textureManager->GetTexture(0);
+
 		m_renderer->AddRenderUnit(renderUnit);
 	}
 
 	m_backBuffer->Clear();
+	m_depthBuffer->Clear();
 
-	m_renderer->SetRenderTarget(m_backBuffer);
+	m_renderer->SetRenderTarget(m_backBuffer, m_depthBuffer);
 	m_renderer->Render();
 
 	m_backBuffer->Present();

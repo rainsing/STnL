@@ -35,27 +35,23 @@ Texture::~Texture()
 Vector4 Texture::Sample( float u, float v )
 {
 	// wrapÑ°Ö··½Ê½
-	if (u > 1.0f)
+	if (u > 1.0f || u < 0.0f)
 	{
-		u -= 1.0f;
-	}
-	else if (u < 0.0f)
-	{
-		u += 1.0f;
+		u = u - Float2Int(u);
 	}
 
-	if (v > 1.0f)
+	if (v > 1.0f || v < 0.0f)
 	{
-		v -= 1.0f;
+		v = v - Float2Int(v);
 	}
-	else if (v < 0.0f)
-	{
-		v += 1.0f;
-	}
+
+	int texelIndex = (Float2Int(v * (m_height - 1)) * m_width + Float2Int(u * (m_width - 1))) << 2;
 
 	Vector4 color;
-
-	;
+	color.x = m_colorData[texelIndex + 0] / 255.0f;
+	color.y = m_colorData[texelIndex + 1] / 255.0f;
+	color.z = m_colorData[texelIndex + 2] / 255.0f;
+	color.w = m_colorData[texelIndex + 3] / 255.0f;
 
 	return color;
 }

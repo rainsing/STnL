@@ -19,6 +19,7 @@ class Vertex
 public:
 	Vector3 position;
 	Vector3 normal;
+	Vector2 texCoord;
 };
 
 #endif // Vertex_h__

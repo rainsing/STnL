@@ -15,6 +15,7 @@
 class VertexBuffer;
 class IndexBuffer;
 class VertexShader;
+class PixelShader;
 
 class RenderUnit
 {
@@ -25,6 +26,7 @@ public:
 	VertexBuffer* m_vb;
 	IndexBuffer* m_ib;
 	VertexShader* m_vs;
+	PixelShader* m_ps;
 };
 
 #endif // RenderUnit_h__

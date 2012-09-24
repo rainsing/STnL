@@ -123,14 +123,15 @@ void LoadObjMesh(std::string filename, Mesh* mesh)
 
 	unsigned nVerts = positions.size();
 
-	VertexBuffer& vb = *(mesh->GetVertexBuffer());
-	vb.Initialize(nVerts);
-
-	for (unsigned i = 0; i < nVerts; i++)
+	std::vector<Vertex> vertexList(nVerts);
+	for (unsigned i = 0; i < vertexList.size(); i++)
 	{
-		vb[i].position.x = positions[i].x;
-		vb[i].position.y = positions[i].y;
-		vb[i].position.z = positions[i].z;
+		vertexList[i].position.x = positions[i].x;
+		vertexList[i].position.y = positions[i].y;
+		vertexList[i].position.z = positions[i].z;
+
+		vertexList[i].texCoord.x = 999.99f;
+		vertexList[i].texCoord.y = 999.99f;
 	}
 	
 	IndexBuffer& ib = *(mesh->GetIndexBuffer());
@@ -143,19 +144,54 @@ void LoadObjMesh(std::string filename, Mesh* mesh)
 		ib[j + 1] = faces[i].pos_index[1] - 1;
 		ib[j + 2] = faces[i].pos_index[2] - 1;
 
-		vb[ib[j + 0]].normal.x = normals[faces[i].nor_index[0] - 1].x;
-		vb[ib[j + 0]].normal.y = normals[faces[i].nor_index[0] - 1].y;
-		vb[ib[j + 0]].normal.z = normals[faces[i].nor_index[0] - 1].z;
+		if (vertexList[ib[j + 0]].texCoord.x != 999.99f || vertexList[ib[j + 0]].texCoord.y != 999.99f)
+		{
+			vertexList.push_back(vertexList[ib[j + 0]]);
+			ib[j + 0] = vertexList.size() - 1;
+		}
 
-		vb[ib[j + 1]].normal.x = normals[faces[i].nor_index[1] - 1].x;
-		vb[ib[j + 1]].normal.y = normals[faces[i].nor_index[1] - 1].y;
-		vb[ib[j + 1]].normal.z = normals[faces[i].nor_index[1] - 1].z;
+		if (vertexList[ib[j + 1]].texCoord.x != 999.99f || vertexList[ib[j + 1]].texCoord.y != 999.99f)
+		{
+			vertexList.push_back(vertexList[ib[j + 1]]);
+			ib[j + 1] = vertexList.size() - 1;
+		}
 
-		vb[ib[j + 2]].normal.x = normals[faces[i].nor_index[2] - 1].x;
-		vb[ib[j + 2]].normal.y = normals[faces[i].nor_index[2] - 1].y;
-		vb[ib[j + 2]].normal.z = normals[faces[i].nor_index[2] - 1].z;
+		if (vertexList[ib[j + 2]].texCoord.x != 999.99f || vertexList[ib[j + 2]].texCoord.y != 999.99f)
+		{
+			vertexList.push_back(vertexList[ib[j + 2]]);
+			ib[j + 2] = vertexList.size() - 1;
+		}
+
+		vertexList[ib[j + 0]].texCoord.x = texcoords[faces[i].tex_index[0] - 1].x;
+		vertexList[ib[j + 0]].texCoord.y = texcoords[faces[i].tex_index[0] - 1].y;
+
+		vertexList[ib[j + 1]].texCoord.x = texcoords[faces[i].tex_index[1] - 1].x;
+		vertexList[ib[j + 1]].texCoord.y = texcoords[faces[i].tex_index[1] - 1].y;
+
+		vertexList[ib[j + 2]].texCoord.x = texcoords[faces[i].tex_index[2] - 1].x;
+		vertexList[ib[j + 2]].texCoord.y = texcoords[faces[i].tex_index[2] - 1].y;
+
+		vertexList[ib[j + 0]].normal.x = normals[faces[i].nor_index[0] - 1].x;
+		vertexList[ib[j + 0]].normal.y = normals[faces[i].nor_index[0] - 1].y;
+		vertexList[ib[j + 0]].normal.z = normals[faces[i].nor_index[0] - 1].z;
+
+		vertexList[ib[j + 1]].normal.x = normals[faces[i].nor_index[1] - 1].x;
+		vertexList[ib[j + 1]].normal.y = normals[faces[i].nor_index[1] - 1].y;
+		vertexList[ib[j + 1]].normal.z = normals[faces[i].nor_index[1] - 1].z;
+
+		vertexList[ib[j + 2]].normal.x = normals[faces[i].nor_index[2] - 1].x;
+		vertexList[ib[j + 2]].normal.y = normals[faces[i].nor_index[2] - 1].y;
+		vertexList[ib[j + 2]].normal.z = normals[faces[i].nor_index[2] - 1].z;
 
 		j += 3;
+	}
+
+	VertexBuffer& vb = *(mesh->GetVertexBuffer());
+	vb.Initialize(vertexList.size());
+
+	for (unsigned i = 0; i < vertexList.size(); i++)
+	{
+		vb[i]= vertexList[i];
 	}
 
     /*for(size_t i = 0; i < faces.size(); ++i){

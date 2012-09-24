@@ -25,9 +25,15 @@ public:
 	~TextureManager();
 
 	Texture* LoadFromFile(const char* fileName);
+	inline Texture* GetTexture(int index);
 
 private:
 	TextureList m_textureList;
 };
+
+Texture* TextureManager::GetTexture( int index )
+{
+	return m_textureList[index];
+}
 
 #endif // TextureManager_h__
