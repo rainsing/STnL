@@ -48,10 +48,11 @@ Vector4 Texture::Sample( float u, float v )
 	int texelIndex = (Float2Int(v * (m_height - 1)) * m_width + Float2Int(u * (m_width - 1))) << 2;
 
 	Vector4 color;
-	color.x = m_colorData[texelIndex + 0] / 255.0f;
-	color.y = m_colorData[texelIndex + 1] / 255.0f;
-	color.z = m_colorData[texelIndex + 2] / 255.0f;
-	color.w = m_colorData[texelIndex + 3] / 255.0f;
+	float r = 1.0f / 255.0f;
+	color.x = m_colorData[texelIndex + 0] * r;
+	color.y = m_colorData[texelIndex + 1] * r;
+	color.z = m_colorData[texelIndex + 2] * r;
+	color.w = m_colorData[texelIndex + 3] * r;
 
 	return color;
 }

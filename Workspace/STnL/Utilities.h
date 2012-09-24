@@ -12,6 +12,8 @@
 #ifndef Utilities_h__
 #define Utilities_h__
 
+#include <xmmintrin.h>
+
 #define PI 3.141592653f
 
 // 交换两个整数的值
@@ -58,6 +60,14 @@ inline int Double2Int(double val)
 inline int Float2Int(float val)
 {
 	return Double2Int ((double)val);
+}
+
+// SSE线性插值
+inline void Lerp_SSE(__m128& out, __m128& v0, __m128& v1, __m128& t)
+{
+	out = _mm_sub_ps(v0, v1);
+	out = _mm_mul_ps(out, t);
+	out = _mm_add_ps(out, v1);
 }
 
 #endif // Utilities_h__
