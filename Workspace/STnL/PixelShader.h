@@ -30,6 +30,9 @@ public:
 
 public:
 	Texture* baseTexture;
+
+	Vector3 diffuseColor;
+	Vector3 ambientColor;
 };
 
 #endif // PixelShader_h__

@@ -24,7 +24,9 @@ public:
 
 public:
 	Vector4 position;
-	Vector4 atrribute0;
+	Vector4 texCoord;
+	Vector4 attribute0;
+	Vector4 attribute1;
 };
 
 VertexShaderOutput Lerp(VertexShaderOutput& va0, VertexShaderOutput& va1, float t);
@@ -43,7 +45,10 @@ public:
 
 public:
 	Matrix4 worldMatrix;
+	Matrix4 inverseWorldMatrix;
 	Matrix4 worldViewProjMatrix;
+
+	Vector3 lightPosition;
 };
 
 #endif // VertexShader_h__

@@ -14,6 +14,8 @@
 
 #include <math.h>
 
+class Vector4;
+
 class Vector2
 {
 public:
@@ -27,7 +29,7 @@ public:
 	inline Vector3(void);
 	inline Vector3(float _x, float _y, float _z);
 
-	inline Vector3 operator -(Vector3& rhs) const;
+	inline Vector3 operator -(const Vector3& rhs) const;
 	inline Vector3 operator +(float f) const;
 	inline Vector3 operator +(Vector3& rhs) const;
 	inline Vector3 operator *(float f) const;
@@ -56,7 +58,7 @@ Vector3::Vector3(float _x, float _y, float _z)
 	z = _z;
 }
 
-Vector3 Vector3::operator-( Vector3& rhs ) const
+Vector3 Vector3::operator-( const Vector3& rhs ) const
 {
 	return Vector3(x - rhs.x , y - rhs.y, z - rhs.z);
 }
@@ -118,6 +120,8 @@ public:
 	inline Vector4(float _x, float _y, float _z, float _w);
 	inline Vector4(const Vector3& vec3);
 
+	inline Vector4 operator -(const Vector4& rhs) const;
+
 	float x;
 	float y;
 	float z;
@@ -145,7 +149,15 @@ Vector4::Vector4( const Vector3& vec3 )
 	w = 1.0f;
 }
 
+Vector4 Vector4::operator-( const Vector4& rhs ) const
+{
+	return Vector4(x - rhs.x , y - rhs.y, z - rhs.z, w - rhs.w);
+}
+
 Vector4 Lerp(Vector4& v0, Vector4& v1, float t);
 void Lerp(Vector4& out, Vector4& v0, Vector4& v1, float t);
+
+Vector4& Clamp(Vector4& value, float minValue, float maxValue);
+Vector4& Saturate(Vector4& value);
 
 #endif // Vector_h__

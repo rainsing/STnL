@@ -70,4 +70,24 @@ inline void Lerp_SSE(__m128& out, __m128& v0, __m128& v1, __m128& t)
 	out = _mm_add_ps(out, v1);
 }
 
+// clamp
+inline float& Clamp(float& value, float minValue, float maxValue)
+{
+	if (value < minValue)
+	{
+		value = minValue;
+	}
+	else if (value > maxValue)
+	{
+		value = maxValue;
+	}
+
+	return value;
+}
+
+inline float& Saturate(float& value)
+{
+	return Clamp(value, 0.0f, 1.0f);
+}
+
 #endif // Utilities_h__

@@ -217,6 +217,8 @@ void Application::Render( void )
 		renderUnit->m_vs = myVS;
 
 		myVS->worldMatrix = object->m_worldMatrix;
+		MatrixTranspose(myVS->inverseWorldMatrix, myVS->worldMatrix);	// This only works when there is no translation or scaling!!!
+		myVS->lightPosition = Vector3(30.0f, 15.0f, -15.0f);
 
 		MatrixMultiply(myVS->worldViewProjMatrix, object->m_worldMatrix, m_activeCamera->GetViewMatrix());
 		MatrixMultiply(myVS->worldViewProjMatrix, myVS->worldViewProjMatrix, m_activeCamera->GetProjMatrix());
@@ -225,6 +227,8 @@ void Application::Render( void )
 		renderUnit->m_ps = myPS;
 
 		myPS->baseTexture = m_textureManager->GetTexture(0);
+		myPS->diffuseColor = Vector3(1.0f, 1.0f, 1.0f);
+		myPS->ambientColor = Vector3(0.15f, 0.15f, 0.15f);
 
 		m_renderer->AddRenderUnit(renderUnit);
 	}

@@ -132,6 +132,9 @@ void LoadObjMesh(std::string filename, Mesh* mesh)
 
 		vertexList[i].texCoord.x = 999.99f;
 		vertexList[i].texCoord.y = 999.99f;
+
+		vertexList[i].binormal = Vector3::ZERO;
+		vertexList[i].tangent = Vector3::ZERO;
 	}
 	
 	IndexBuffer& ib = *(mesh->GetIndexBuffer());
@@ -162,26 +165,61 @@ void LoadObjMesh(std::string filename, Mesh* mesh)
 			ib[j + 2] = vertexList.size() - 1;
 		}
 
-		vertexList[ib[j + 0]].texCoord.x = texcoords[faces[i].tex_index[0] - 1].x;
-		vertexList[ib[j + 0]].texCoord.y = texcoords[faces[i].tex_index[0] - 1].y;
+		Vertex& v0 = vertexList[ib[j + 0]];
+		Vertex& v1 = vertexList[ib[j + 1]];
+		Vertex& v2 = vertexList[ib[j + 2]];
 
-		vertexList[ib[j + 1]].texCoord.x = texcoords[faces[i].tex_index[1] - 1].x;
-		vertexList[ib[j + 1]].texCoord.y = texcoords[faces[i].tex_index[1] - 1].y;
+		v0.texCoord.x = texcoords[faces[i].tex_index[0] - 1].x;
+		v0.texCoord.y = texcoords[faces[i].tex_index[0] - 1].y;
 
-		vertexList[ib[j + 2]].texCoord.x = texcoords[faces[i].tex_index[2] - 1].x;
-		vertexList[ib[j + 2]].texCoord.y = texcoords[faces[i].tex_index[2] - 1].y;
+		v1.texCoord.x = texcoords[faces[i].tex_index[1] - 1].x;
+		v1.texCoord.y = texcoords[faces[i].tex_index[1] - 1].y;
 
-		vertexList[ib[j + 0]].normal.x = normals[faces[i].nor_index[0] - 1].x;
-		vertexList[ib[j + 0]].normal.y = normals[faces[i].nor_index[0] - 1].y;
-		vertexList[ib[j + 0]].normal.z = normals[faces[i].nor_index[0] - 1].z;
+		v2.texCoord.x = texcoords[faces[i].tex_index[2] - 1].x;
+		v2.texCoord.y = texcoords[faces[i].tex_index[2] - 1].y;
 
-		vertexList[ib[j + 1]].normal.x = normals[faces[i].nor_index[1] - 1].x;
-		vertexList[ib[j + 1]].normal.y = normals[faces[i].nor_index[1] - 1].y;
-		vertexList[ib[j + 1]].normal.z = normals[faces[i].nor_index[1] - 1].z;
+		v0.normal.x = normals[faces[i].nor_index[0] - 1].x;
+		v0.normal.y = normals[faces[i].nor_index[0] - 1].y;
+		v0.normal.z = normals[faces[i].nor_index[0] - 1].z;
 
-		vertexList[ib[j + 2]].normal.x = normals[faces[i].nor_index[2] - 1].x;
-		vertexList[ib[j + 2]].normal.y = normals[faces[i].nor_index[2] - 1].y;
-		vertexList[ib[j + 2]].normal.z = normals[faces[i].nor_index[2] - 1].z;
+		v1.normal.x = normals[faces[i].nor_index[1] - 1].x;
+		v1.normal.y = normals[faces[i].nor_index[1] - 1].y;
+		v1.normal.z = normals[faces[i].nor_index[1] - 1].z;
+
+		v2.normal.x = normals[faces[i].nor_index[2] - 1].x;
+		v2.normal.y = normals[faces[i].nor_index[2] - 1].y;
+		v2.normal.z = normals[faces[i].nor_index[2] - 1].z;
+
+		// 计算切线和副法线
+		float x1 = v1.position.x - v0.position.x;
+		float x2 = v2.position.x - v0.position.x;
+		float y1 = v1.position.y - v0.position.y;
+		float y2 = v2.position.y - v0.position.y;
+		float z1 = v1.position.z - v0.position.z;
+		float z2 = v2.position.z - v0.position.z;
+
+		float _u1 = v1.texCoord.x - v0.texCoord.x;
+		float _u2 = v2.texCoord.x - v0.texCoord.x;
+		float _v1 = v1.texCoord.y - v0.texCoord.y;
+		float _v2 = v2.texCoord.y - v0.texCoord.y;
+
+		if (_u1 * _v2 - _u2 * _v1 == 0.0f)
+		{
+			j += 3;
+			continue;
+		}
+
+		float r = 1.0f / (_u1 * _v2 - _u2 * _v1);
+		Vector3 uDir((_v2 * x1 - _v1 * x2) * r, (_v2 * y1 - _v1 * y2) * r,(_v2 * z1 - _v1 * z2) * r);
+		Vector3 vDir((_u1 * x2 - _u2 * x1) * r, (_u1 * y2 - _u2 * y1) * r,(_u1 * z2 - _u2 * z1) * r);
+
+		v0.binormal = v0.binormal + uDir;
+		v1.binormal = v1.binormal + uDir;
+		v2.binormal = v2.binormal + uDir;
+
+		v0.tangent = v0.tangent + vDir;
+		v1.tangent = v1.tangent + vDir;
+		v2.tangent = v2.tangent + vDir;
 
 		j += 3;
 	}
@@ -191,6 +229,40 @@ void LoadObjMesh(std::string filename, Mesh* mesh)
 
 	for (unsigned i = 0; i < vertexList.size(); i++)
 	{
+		// 对normal, binormal和tangent做Gram-Schmidt正交化处理
+		// --begin--
+		Vector3& normal = vertexList[i].normal;
+
+		Vector3& binormal = vertexList[i].binormal;
+		binormal = binormal - normal * binormal.Dot(normal);
+
+		// 整出这种UV来还指望光照能正确么？！
+		if (binormal.Equal(Vector3::ZERO, 0.0001f))
+		{
+			binormal.x = 1.0f;
+		}
+
+		binormal.Normalize();
+
+		// TODO: 这里可能会有handedness的问题 想想春春是怎么解决NCIS的normal map问题的
+		Vector3& tangent = vertexList[i].tangent;
+
+		Vector3& d1 = tangent - normal * tangent.Dot(normal);
+		Vector3& d2 = tangent - binormal * tangent.Dot(binormal);
+		tangent = tangent - d1;
+		tangent = tangent - d2;
+
+		// 整出这种UV来光照肯定正确不了啊！
+		if (tangent.Equal(Vector3::ZERO, 0.0001f))
+		{
+			tangent.y = 1.0f;
+		}
+
+		tangent.Normalize();
+
+		// 对normal, binormal和tangent做Gram-Schmidt正交化处理
+		// --end--
+
 		vb[i]= vertexList[i];
 	}
 

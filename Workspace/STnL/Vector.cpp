@@ -12,6 +12,7 @@
 #include "stdafx.h"
 #include "Vector.h"
 
+#include "Utilities.h"
 #include <xmmintrin.h>
 
 const Vector3 Vector3::ZERO(0.0f, 0.0f, 0.0f);
@@ -54,4 +55,19 @@ void Lerp(Vector4& out, Vector4& v0, Vector4& v1, float t)
 	m128_0 = _mm_add_ps(m128_0, m128_1);
 
 	_mm_storeu_ps(&out.x, m128_0);*/
+}
+
+Vector4& Clamp(Vector4& value, float minValue, float maxValue)
+{
+	Clamp(value.x, minValue, maxValue);
+	Clamp(value.y, minValue, maxValue);
+	Clamp(value.z, minValue, maxValue);
+	Clamp(value.w, minValue, maxValue);
+
+	return value;
+}
+
+Vector4& Saturate( Vector4& value )
+{
+	return Clamp(value, 0.0f, 1.0f);
 }

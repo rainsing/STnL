@@ -14,8 +14,37 @@
 
 #include "Texture.h"
 #include "VertexShader.h"
+#include "Utilities.h"
 
 Vector4 MyPixelShader::Main( VertexShaderOutput& vertexAttribute )
 {
-	return baseTexture->Sample(vertexAttribute.atrribute0.x, vertexAttribute.atrribute0.y);
+	Vector4& baseColor = baseTexture->Sample(vertexAttribute.texCoord.x, vertexAttribute.texCoord.y);
+
+	/*Vector3 objectSpaceNormal;
+	objectSpaceNormal.x = vertexAttribute.attribute0.x;
+	objectSpaceNormal.y = vertexAttribute.attribute0.y;
+	objectSpaceNormal.z = vertexAttribute.attribute0.z;
+	objectSpaceNormal.Normalize();*/
+	Vector3 normal(0.0f, 0.0f, 1.0f);
+
+	/*Vector3 objectSpaceLightDirection;
+	objectSpaceLightDirection.x = vertexAttribute.attribute1.x;
+	objectSpaceLightDirection.y = vertexAttribute.attribute1.y;
+	objectSpaceLightDirection.z = vertexAttribute.attribute1.z;
+	objectSpaceLightDirection.Normalize();*/
+	Vector3 lightDir;
+	lightDir.x = vertexAttribute.attribute0.x;
+	lightDir.y = vertexAttribute.attribute0.y;
+	lightDir.z = vertexAttribute.attribute0.z;
+	lightDir.Normalize();
+
+	/*float angle = objectSpaceNormal.Dot(objectSpaceLightDirection);*/
+	float angle = normal.Dot(lightDir);
+	Saturate(angle);
+
+	baseColor.x *= angle * diffuseColor.x + ambientColor.x;
+	baseColor.y *= angle * diffuseColor.y + ambientColor.y;
+	baseColor.z *= angle * diffuseColor.z + ambientColor.z;
+
+	return Saturate(baseColor);
 }

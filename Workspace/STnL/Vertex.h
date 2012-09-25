@@ -19,6 +19,8 @@ class Vertex
 public:
 	Vector3 position;
 	Vector3 normal;
+	Vector3 binormal;
+	Vector3 tangent;
 	Vector2 texCoord;
 };
 
