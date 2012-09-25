@@ -357,15 +357,19 @@ bool Renderer::RemoveBackface( Triangle& triangle, VsOutList& vsOuts, CullMode c
 	VertexShaderOutput& v1 = vsOuts[triangle.iV1];
 	VertexShaderOutput& v2 = vsOuts[triangle.iV2];
 
+	float w0R = 1.0f / v0.position.w;
+	float w1R = 1.0f / v1.position.w;
+	float w2R = 1.0f / v2.position.w;
+
 	Vector3 e1;
-	e1.x = v1.position.x / v1.position.w - v0.position.x / v0.position.w;
-	e1.y = v1.position.y / v1.position.w - v0.position.y / v0.position.w;
-	e1.z = v1.position.z / v1.position.w - v0.position.z / v0.position.w;
+	e1.x = v1.position.x * w1R - v0.position.x * w0R;
+	e1.y = v1.position.y * w1R - v0.position.y * w0R;
+	e1.z = v1.position.z * w1R - v0.position.z * w0R;
 
 	Vector3 e2;
-	e2.x = v2.position.x / v2.position.w - v0.position.x / v0.position.w;
-	e2.y = v2.position.y / v2.position.w - v0.position.y / v0.position.w;
-	e2.z = v2.position.z / v2.position.w - v0.position.z / v0.position.w;
+	e2.x = v2.position.x * w2R - v0.position.x * w0R;
+	e2.y = v2.position.y * w2R - v0.position.y * w0R;
+	e2.z = v2.position.z * w2R - v0.position.z * w0R;
 
 	Vector3 faceNormal = e1.Cross(e2);
 
@@ -389,14 +393,14 @@ void Renderer::FillSpan( float x0, float x1, int y, VertexShaderOutput& va0, Ver
 {
 	int startX = Float2Int(x0);
 	int endX = Float2Int(x1);
-	float len = x1 - x0;
+	float lenR = 1.0f / (x1 - x0);
 	float xt = x0;
 
 	VertexShaderOutput va;
 	for (int x = startX; x < endX; x++)
 	{
 		xt = float(x + 1);
-		Lerp(va, va0, va1, (x1 - xt) / len);
+		Lerp(va, va0, va1, (x1 - xt) * lenR);
 
 		// early z-test (before executing pixel shader)
 		if (!m_depthBuffer->TestDepth(x, y, va.position.z))
@@ -404,7 +408,8 @@ void Renderer::FillSpan( float x0, float x1, int y, VertexShaderOutput& va0, Ver
 			continue;
 		}
 		
-		Vector4 color = ps.Main(va);
+		// execute the pixel shader
+		Vector4& color = ps.Main(va);
 
 		int r = Float2Int(color.x * 255.0f);
 		int g = Float2Int(color.y * 255.0f);

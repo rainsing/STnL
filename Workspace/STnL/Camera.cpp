@@ -19,7 +19,7 @@ Camera::Camera(float aspect)
 	m_up = Vector3(0.0f, 1.0f, 0.0f);
 	m_nearClipDistance = 0.1f;
 	m_farClipDistance = 70.0f;
-	m_verticalFov = 60.0f;
+	m_verticalFov = 45.0f;
 	m_aspect = aspect;
 
 	m_viewMatrixDirty = m_projMatrixDirty = true;

@@ -30,6 +30,7 @@ public:
 
 public:
 	Texture* baseTexture;
+	Texture* normalTexture;
 
 	Vector3 diffuseColor;
 	Vector3 ambientColor;

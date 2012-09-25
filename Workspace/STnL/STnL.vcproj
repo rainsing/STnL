@@ -125,7 +125,7 @@
 				FavorSizeOrSpeed="1"
 				AdditionalIncludeDirectories="&quot;..\3Party\DevIL-SDK-x86-1.7.8\include&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
-				RuntimeLibrary="2"
+				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
 				RuntimeTypeInfo="false"
 				UsePrecompiledHeader="2"

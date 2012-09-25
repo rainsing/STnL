@@ -71,7 +71,8 @@ void Application::Initialize( HWND hWnd, int windowWidth, int windowHeight )
 	m_depthBuffer = new DepthBuffer(windowWidth, windowHeight);
 	
 	Mesh* mesh = m_meshManager->LoadFromFile("..\\Media\\teapot.mesh");
-	Texture* texture = m_textureManager->LoadFromFile("..\\Media\\ripple.bmp");
+	m_textureManager->LoadFromFile("..\\Media\\base.tga");
+	m_textureManager->LoadFromFile("..\\Media\\normal.tga");
 
 	SceneObject* object = new SceneObject(mesh, NULL);
 	m_sceneObjectList.push_back(object);
@@ -227,8 +228,9 @@ void Application::Render( void )
 		renderUnit->m_ps = myPS;
 
 		myPS->baseTexture = m_textureManager->GetTexture(0);
+		myPS->normalTexture = m_textureManager->GetTexture(1);
 		myPS->diffuseColor = Vector3(1.0f, 1.0f, 1.0f);
-		myPS->ambientColor = Vector3(0.15f, 0.15f, 0.15f);
+		myPS->ambientColor = Vector3(0.05f, 0.05f, 0.05f);
 
 		m_renderer->AddRenderUnit(renderUnit);
 	}

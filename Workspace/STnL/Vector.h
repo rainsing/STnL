@@ -84,10 +84,10 @@ Vector3 Vector3::operator*( float f ) const
 
 void Vector3::Normalize( void )
 {
-	float len = sqrt(x * x + y * y + z * z);
-	x /= len;
-	y /= len;
-	z /= len;
+	float lenReciprocal = 1.0f / sqrt(x * x + y * y + z * z);
+	x *= lenReciprocal;
+	y *= lenReciprocal;
+	z *= lenReciprocal;
 }
 
 float Vector3::Dot( Vector3& rhs ) const

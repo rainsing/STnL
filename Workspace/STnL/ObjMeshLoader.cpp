@@ -213,13 +213,13 @@ void LoadObjMesh(std::string filename, Mesh* mesh)
 		Vector3 uDir((_v2 * x1 - _v1 * x2) * r, (_v2 * y1 - _v1 * y2) * r,(_v2 * z1 - _v1 * z2) * r);
 		Vector3 vDir((_u1 * x2 - _u2 * x1) * r, (_u1 * y2 - _u2 * y1) * r,(_u1 * z2 - _u2 * z1) * r);
 
-		v0.binormal = v0.binormal + uDir;
-		v1.binormal = v1.binormal + uDir;
-		v2.binormal = v2.binormal + uDir;
+		v0.binormal = v0.binormal + vDir;
+		v1.binormal = v1.binormal + vDir;
+		v2.binormal = v2.binormal + vDir;
 
-		v0.tangent = v0.tangent + vDir;
-		v1.tangent = v1.tangent + vDir;
-		v2.tangent = v2.tangent + vDir;
+		v0.tangent = v0.tangent - uDir;
+		v1.tangent = v1.tangent - uDir;
+		v2.tangent = v2.tangent - uDir;
 
 		j += 3;
 	}

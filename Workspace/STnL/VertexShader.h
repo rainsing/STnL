@@ -24,7 +24,7 @@ public:
 
 public:
 	Vector4 position;
-	Vector4 texCoord;
+	Vector2 texCoord;
 	Vector4 attribute0;
 	Vector4 attribute1;
 };

@@ -37,15 +37,15 @@ Vector4 Texture::Sample( float u, float v )
 	// wrapÑ°Ö··½Ê½
 	if (u > 1.0f || u < 0.0f)
 	{
-		u = u - Float2Int(u);
+		u -= Float2Int(u);
 	}
 
 	if (v > 1.0f || v < 0.0f)
 	{
-		v = v - Float2Int(v);
+		v -= Float2Int(v);
 	}
 
-	int texelIndex = (Float2Int(v * (m_height - 1)) * m_width + Float2Int(u * (m_width - 1))) << 2;
+	int texelIndex = (Float2Int(v * (m_height - 1.0f)) * m_width + Float2Int(u * (m_width - 1.0f))) << 2;
 
 	Vector4 color;
 	float r = 1.0f / 255.0f;
