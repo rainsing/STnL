@@ -55,7 +55,7 @@ Vector4 Texture::Sample( float u, float v )
 	}
 	else if (u < 0.0f)
 	{
-		u = 1.0f - (float)modf(double(u), &dummy);
+		u = 1.0f + (float)modf(double(u), &dummy);
 	}
 
 	if (v > 1.0f)
@@ -64,7 +64,7 @@ Vector4 Texture::Sample( float u, float v )
 	}
 	else if (v < 0.0f)
 	{
-		v = 1.0f - (float)modf(double(v), &dummy);
+		v = 1.0f + (float)modf(double(v), &dummy);
 	}
 
 	int texelIndex = (Float2Int(v * (m_height - 1.0f)) * m_width + Float2Int(u * (m_width - 1.0f))) << 2;

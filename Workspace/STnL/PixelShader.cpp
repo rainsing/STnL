@@ -21,8 +21,9 @@ Vector4 MyPixelShader::Main( VertexShaderOutput& vertexAttribute )
 	Vector4& baseColor = baseTexture->Sample(vertexAttribute.texCoord.x, vertexAttribute.texCoord.y);
 	Vector4& normal4 = normalTexture->Sample(vertexAttribute.texCoord.x, vertexAttribute.texCoord.y);
 
-	Vector3 normal(normal4.x * 2.0f - 1.0f, normal4.y * 2.0f - 1.0f, normal4.z * 2.0f - 1.0f);
-	normal.Normalize();
+	//Vector3 normal(normal4.x * 2.0f - 1.0f, normal4.y * 2.0f - 1.0f, normal4.z * 2.0f - 1.0f);
+	//normal.Normalize();
+	Vector3 normal(0.0f, 0.0f, 1.0f);
 
 	Vector3 lightDir;
 	lightDir.x = vertexAttribute.attribute0.x;

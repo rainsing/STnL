@@ -28,8 +28,11 @@ VertexShaderOutput MyVertexShader::Main( const Vertex& vertex )
 	output.position = worldViewProjMatrix.Transform(vertex.position);
 
 	// uv
-	output.texCoord.x = vertex.texCoord.x;
-	output.texCoord.y = vertex.texCoord.y;
+	/*output.texCoord.x = vertex.texCoord.x;
+	output.texCoord.y = vertex.texCoord.y;*/
+
+	output.texCoord.x = vertex.texCoord.x * 2.0f;
+	output.texCoord.y = 1.0f - vertex.texCoord.y;
 
 	// normal vector
 	Vector4& objSpaceLightPos = inverseWorldMatrix.Transform(lightPosition);

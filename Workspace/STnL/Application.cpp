@@ -70,8 +70,12 @@ void Application::Initialize( HWND hWnd, int windowWidth, int windowHeight )
 	m_textOutput = new TextOutput(hWnd);
 	m_depthBuffer = new DepthBuffer(windowWidth, windowHeight);
 	
-	Mesh* mesh = m_meshManager->LoadFromFile("..\\Media\\teapot.mesh");
-	m_textureManager->LoadFromFile("..\\Media\\base.tga");
+	//Mesh* mesh = m_meshManager->LoadFromFile("..\\Media\\teapot.mesh");
+	//m_textureManager->LoadFromFile("..\\Media\\base.tga");
+	//m_textureManager->LoadFromFile("..\\Media\\normal.tga");
+
+	Mesh* mesh = m_meshManager->LoadFromFile("..\\Media\\marine.mesh");
+	m_textureManager->LoadFromFile("..\\Media\\marine_diffuse.dds");
 	m_textureManager->LoadFromFile("..\\Media\\normal.tga");
 
 	SceneObject* object = new SceneObject(mesh, NULL);
@@ -255,8 +259,8 @@ void Application::Render( void )
 
 		myPS->baseTexture = m_textureManager->GetTexture(0);
 		myPS->normalTexture = m_textureManager->GetTexture(1);
-		myPS->diffuseColor = Vector3(1.0f, 1.0f, 1.0f);
-		myPS->ambientColor = Vector3(0.05f, 0.05f, 0.05f);
+		myPS->diffuseColor = Vector3(1.0f, 0.5f, 0.5f);
+		myPS->ambientColor = Vector3(0.4f, 0.4f, 0.4f);
 
 		m_renderer->AddRenderUnit(renderUnit);
 	}
