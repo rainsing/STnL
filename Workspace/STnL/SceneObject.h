@@ -23,14 +23,17 @@ public:
 	SceneObject(Mesh* mesh, Material* material);
 
 	void LocalRotate(float x, float y, float z);
-	inline Mesh* GetMesh(void);
+	void ResetRotation(void);
+	void GetWorldMatrix(Matrix4& out);
 
-public:
-	Matrix4 m_worldMatrix;
+	inline Mesh* GetMesh(void);
 
 private:
 	Mesh* m_mesh;
 	Material* m_material;
+
+	Matrix4 m_worldMatrix;
+	Matrix4 m_rotationMatrix;
 };
 
 Mesh* SceneObject::GetMesh( void )

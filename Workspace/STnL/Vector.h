@@ -34,6 +34,7 @@ public:
 	inline Vector3 operator +(Vector3& rhs) const;
 	inline Vector3 operator *(float f) const;
 
+	inline float Length(void);
 	inline void Normalize(void);
 	inline float Dot(Vector3& rhs) const;
 	inline Vector3 Cross(Vector3& rhs) const;
@@ -82,9 +83,14 @@ Vector3 Vector3::operator*( float f ) const
 	return out;
 }
 
+float Vector3::Length( void )
+{
+	return sqrt(x * x + y * y + z * z);
+}
+
 void Vector3::Normalize( void )
 {
-	float lenReciprocal = 1.0f / sqrt(x * x + y * y + z * z);
+	float lenReciprocal = 1.0f / Length();
 	x *= lenReciprocal;
 	y *= lenReciprocal;
 	z *= lenReciprocal;

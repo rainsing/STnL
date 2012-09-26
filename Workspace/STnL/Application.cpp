@@ -66,7 +66,7 @@ void Application::Initialize( HWND hWnd, int windowWidth, int windowHeight )
 	m_meshManager = new MeshManager();
 	m_textureManager = new TextureManager();
 	m_inputCapturer = new InputCapturer();
-	m_activeCamera = new Camera(float(windowWidth) / windowHeight);
+	m_activeCamera = new Camera(Vector3(0.0f, 50.0f, -10.0f), Vector3::ZERO, 0.1f, 700.0f, 45.0f, float(windowWidth) / windowHeight);
 	m_textOutput = new TextOutput(hWnd);
 	m_depthBuffer = new DepthBuffer(windowWidth, windowHeight);
 	
@@ -149,7 +149,8 @@ void Application::Update( void )
 
 	if (rotationX != 0.0f || rotationY != 0.0f)
 	{
-		object->LocalRotate(rotationX, rotationY, 0.0f);
+		//object->LocalRotate(rotationX, rotationY, 0.0f);
+		m_activeCamera->LocalRotate(rotationX, rotationY);
 	}
 
 	// 控制物体旋转
@@ -172,11 +173,11 @@ void Application::Update( void )
 		offsetX = offsetAmount;
 	}
 
-	if (m_inputCapturer->IsKeyDown(KC_F) && !m_inputCapturer->IsKeyDown(KC_R))
+	if (m_inputCapturer->IsKeyDown(KC_Q) && !m_inputCapturer->IsKeyDown(KC_E))
 	{
 		offsetY = -offsetAmount;
 	}
-	else if (!m_inputCapturer->IsKeyDown(KC_F) && m_inputCapturer->IsKeyDown(KC_R))
+	else if (!m_inputCapturer->IsKeyDown(KC_Q) && m_inputCapturer->IsKeyDown(KC_E))
 	{
 		offsetY = offsetAmount;
 	}
@@ -197,6 +198,13 @@ void Application::Update( void )
 
 	// 控制摄像机移动
 	// --end--
+
+	// 重置场景
+	if (m_inputCapturer->IsKeyPressed(KC_R))
+	{
+		object->ResetRotation();
+		m_activeCamera->Reset();
+	}
 }
 
 void Application::Render( void )
@@ -217,11 +225,11 @@ void Application::Render( void )
 		MyVertexShader* myVS = new MyVertexShader();
 		renderUnit->m_vs = myVS;
 
-		myVS->worldMatrix = object->m_worldMatrix;
+		object->GetWorldMatrix(myVS->worldMatrix);
 		MatrixTranspose(myVS->inverseWorldMatrix, myVS->worldMatrix);	// This only works when there is no translation or scaling!!!
 		myVS->lightPosition = Vector3(30.0f, 15.0f, -15.0f);
 
-		MatrixMultiply(myVS->worldViewProjMatrix, object->m_worldMatrix, m_activeCamera->GetViewMatrix());
+		MatrixMultiply(myVS->worldViewProjMatrix, myVS->worldMatrix, m_activeCamera->GetViewMatrix());
 		MatrixMultiply(myVS->worldViewProjMatrix, myVS->worldViewProjMatrix, m_activeCamera->GetProjMatrix());
 
 		MyPixelShader* myPS = new MyPixelShader();

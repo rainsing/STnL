@@ -22,7 +22,8 @@ enum KeyCode
 	KC_S,
 	KC_D,
 	KC_W,
-	KC_F,
+	KC_Q,
+	KC_E,
 	KC_R,
 };
 
@@ -30,6 +31,7 @@ class InputCapturer
 {
 public:
 	bool IsKeyDown(KeyCode keyCode);
+	bool IsKeyPressed(KeyCode keyCode);
 };
 
 #endif // InputCapturer_h__

@@ -18,17 +18,20 @@
 class Camera
 {
 public:
-	Camera(float aspect);
+	Camera(const Vector3& position, const Vector3& lookAt, float nearClipDistance, float farClipDistance, float fov, float aspect);
 
 	const Matrix4& GetViewMatrix(void);
 	const Matrix4& GetProjMatrix(void);
 
 	void LocalMove(float x, float y, float z);
+	void LocalRotate(float x, float y);
+	void Reset(void);
 
 private:
 	Vector3 m_position;
 	Vector3 m_lookAt;
 	Vector3 m_up;
+	float m_distanceToLookAt;
 
 	Matrix4 m_viewMatrix;
 	bool m_viewMatrixDirty;
@@ -40,6 +43,9 @@ private:
 
 	Matrix4 m_projMatrix;
 	bool m_projMatrixDirty;
+
+	const Vector3 m_init_position;
+	const Vector3 m_init_lookAt;
 };
 
 #endif // Camera_h__

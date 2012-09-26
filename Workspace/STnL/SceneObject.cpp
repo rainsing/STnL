@@ -17,6 +17,7 @@ SceneObject::SceneObject( Mesh* mesh, Material* material )
 	m_mesh = mesh;
 	m_material = material;
 	m_worldMatrix = Matrix4::IDENTITY;
+	m_rotationMatrix = Matrix4::IDENTITY;
 }
 
 void SceneObject::LocalRotate( float x, float y, float z )
@@ -24,11 +25,21 @@ void SceneObject::LocalRotate( float x, float y, float z )
 	Matrix4 rotationMatrix;
 
 	MakeRotationMatrixX(rotationMatrix, x);
-	MatrixMultiply(m_worldMatrix, rotationMatrix, m_worldMatrix);
+	MatrixMultiply(m_rotationMatrix, m_rotationMatrix, rotationMatrix);
 
 	MakeRotationMatrixY(rotationMatrix, y);
-	MatrixMultiply(m_worldMatrix, rotationMatrix, m_worldMatrix);
+	MatrixMultiply(m_rotationMatrix, m_rotationMatrix, rotationMatrix);
 
 	MakeRotationMatrixZ(rotationMatrix, z);
-	MatrixMultiply(m_worldMatrix, rotationMatrix, m_worldMatrix);
+	MatrixMultiply(m_rotationMatrix, m_rotationMatrix, rotationMatrix);
+}
+
+void SceneObject::ResetRotation( void )
+{
+	m_rotationMatrix = Matrix4::IDENTITY;
+}
+
+void SceneObject::GetWorldMatrix( Matrix4& out )
+{
+	MatrixMultiply(out, m_rotationMatrix, m_worldMatrix);
 }

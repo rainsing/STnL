@@ -49,10 +49,26 @@ bool InputCapturer::IsKeyDown( KeyCode keyCode )
 		virtKey = 'W';
 		break;
 
-	case KC_F:
-		virtKey = 'F';
+	case KC_Q:
+		virtKey = 'Q';
 		break;
 
+	case KC_E:
+		virtKey = 'E';
+		break;
+
+	default:
+		return false;
+	}
+
+	return (GetKeyState(virtKey) & 0x8000) != 0;
+}
+
+bool InputCapturer::IsKeyPressed( KeyCode keyCode )
+{
+	int virtKey;
+	switch (keyCode)
+	{
 	case KC_R:
 		virtKey = 'R';
 		break;
@@ -61,5 +77,5 @@ bool InputCapturer::IsKeyDown( KeyCode keyCode )
 		return false;
 	}
 
-	return (GetKeyState(virtKey) & 0x8000) != 0;
+	return (GetAsyncKeyState(virtKey) & 0x0001) != 0;
 }

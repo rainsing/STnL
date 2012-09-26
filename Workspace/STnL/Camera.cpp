@@ -12,14 +12,18 @@
 #include "stdafx.h"
 #include "Camera.h"
 
-Camera::Camera(float aspect)
+Camera::Camera(const Vector3& position, const Vector3& lookAt, float nearClipDistance, float farClipDistance, float fov, float aspect)
+	:m_init_position(position), m_init_lookAt(lookAt)
 {
-	m_position = Vector3(0.0f, 30.0f, -50.0f);
-	m_lookAt = Vector3::ZERO;
+	m_position = position;
+	m_lookAt = lookAt;
 	m_up = Vector3(0.0f, 1.0f, 0.0f);
-	m_nearClipDistance = 0.1f;
-	m_farClipDistance = 70.0f;
-	m_verticalFov = 45.0f;
+
+	m_distanceToLookAt = (m_lookAt - m_position).Length();
+
+	m_nearClipDistance = nearClipDistance;
+	m_farClipDistance = farClipDistance;
+	m_verticalFov = fov;
 	m_aspect = aspect;
 
 	m_viewMatrixDirty = m_projMatrixDirty = true;
@@ -86,4 +90,44 @@ void Camera::LocalMove( float x, float y, float z )
 	m_lookAt.z += worldSpaceOffset.z;
 
 	m_viewMatrixDirty = true;
+}
+
+void Camera::Reset( void )
+{
+	m_position = m_init_position;
+	m_lookAt = m_init_lookAt;
+	m_viewMatrixDirty = true;
+}
+
+void Camera::LocalRotate( float x, float y )
+{
+	Matrix4 viewSpaceRotation;
+	MakeRotationMatrixX(viewSpaceRotation, 0.0f);
+	
+	Matrix4 viewSpaceRotationY;
+	MakeRotationMatrixY(viewSpaceRotationY, y);
+
+	MatrixMultiply(viewSpaceRotation, viewSpaceRotation, viewSpaceRotationY);
+
+	Vector4& newViewDirection = viewSpaceRotation.Transform(Vector3(0.0f, 0.0f, 1.0f));
+
+	Matrix4 cameraRotation = GetViewMatrix();
+	cameraRotation.m41 = cameraRotation.m42 = cameraRotation.m43 = 0.0f;
+
+	Matrix4 inverseCameraRotation;
+	MatrixTranspose(inverseCameraRotation, cameraRotation);
+
+	Vector4& newWorldSpaceViewDir = inverseCameraRotation.Transform(newViewDirection);
+
+	Vector3 newWorldSpaceViewDir3;
+	newWorldSpaceViewDir3.x = newWorldSpaceViewDir.x;
+	newWorldSpaceViewDir3.y = newWorldSpaceViewDir.y;
+	newWorldSpaceViewDir3.z = newWorldSpaceViewDir.z;
+	newWorldSpaceViewDir3.Normalize();
+
+	if (fabs(newWorldSpaceViewDir3.Dot(m_up)) < 1.0f - 0.0001f)
+	{
+		m_position = m_lookAt - newWorldSpaceViewDir3 * m_distanceToLookAt;
+		m_viewMatrixDirty = true;
+	}	
 }
