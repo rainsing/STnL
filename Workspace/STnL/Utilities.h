@@ -16,6 +16,9 @@
 
 #define PI 3.141592653f
 
+#define GET_X_LPARAM(lp)                        ((int)(short)LOWORD(lp))
+#define GET_Y_LPARAM(lp)                        ((int)(short)HIWORD(lp))
+
 // 交换两个整数的值
 inline void swap(int& a, int& b)
 {

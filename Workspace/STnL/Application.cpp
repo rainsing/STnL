@@ -66,7 +66,7 @@ void Application::Initialize( HWND hWnd, int windowWidth, int windowHeight )
 	m_meshManager = new MeshManager();
 	m_textureManager = new TextureManager();
 	m_inputCapturer = new InputCapturer();
-	m_activeCamera = new Camera(Vector3(0.0f, 50.0f, -10.0f), Vector3::ZERO, 0.1f, 700.0f, 45.0f, float(windowWidth) / windowHeight);
+	m_activeCamera = new Camera(Vector3(0.0f, 5.0f, -40.0f), Vector3(0.0f, 5.0f, 0.0f), 0.1f, 100.0f, 45.0f, float(windowWidth) / windowHeight);
 	m_textOutput = new TextOutput(hWnd);
 	m_depthBuffer = new DepthBuffer(windowWidth, windowHeight);
 	
@@ -149,8 +149,7 @@ void Application::Update( void )
 
 	if (rotationX != 0.0f || rotationY != 0.0f)
 	{
-		//object->LocalRotate(rotationX, rotationY, 0.0f);
-		m_activeCamera->LocalRotate(rotationX, rotationY);
+		object->LocalRotate(rotationX, rotationY, 0.0f);
 	}
 
 	// 控制物体旋转
@@ -199,12 +198,31 @@ void Application::Update( void )
 	// 控制摄像机移动
 	// --end--
 
+	// 控制摄像机旋转
+	// --begin--
+
+	if (m_inputCapturer->IsLeftBtnDown())
+	{
+		int dx, dy;
+		m_inputCapturer->GetMouseMovement(dx, dy);
+
+		if (dx != 0 || dy != 0)
+		{
+			m_activeCamera->LocalRotate(dy * 0.5f, dx * 0.5f);
+		}
+	}
+
+	// 控制摄像机旋转
+	// --end--
+
 	// 重置场景
 	if (m_inputCapturer->IsKeyPressed(KC_R))
 	{
 		object->ResetRotation();
 		m_activeCamera->Reset();
 	}
+
+	m_inputCapturer->ClearMouseMovement();
 }
 
 void Application::Render( void )

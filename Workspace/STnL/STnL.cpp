@@ -4,6 +4,8 @@
 #include "stdafx.h"
 #include "STnL.h"
 
+#include "Utilities.h"
+#include "InputCapturer.h"
 #include "Application.h"
 #include "BackBuffer.h"
 
@@ -209,6 +211,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		break;
+
+	case WM_LBUTTONDOWN:
+		InputCapturer::SetLeftBtnDown(true);
+		InputCapturer::SetMousePosition(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+		break;
+	case WM_LBUTTONUP:
+		InputCapturer::SetLeftBtnDown(false);
+		InputCapturer::SetMousePosition(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+		break;
+	case WM_MOUSEMOVE:
+		InputCapturer::SetMousePosition(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+		break;
+
 	default:
 		return DefWindowProc(hWnd, message, wParam, lParam);
 	}

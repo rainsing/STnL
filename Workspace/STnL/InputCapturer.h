@@ -32,6 +32,20 @@ class InputCapturer
 public:
 	bool IsKeyDown(KeyCode keyCode);
 	bool IsKeyPressed(KeyCode keyCode);
+
+	static void SetLeftBtnDown(bool leftBtnDown);
+	static void SetMousePosition(int x, int y);
+
+	bool IsLeftBtnDown(void);
+	void GetMouseMovement(int& dx, int& dy);
+	void ClearMouseMovement(void);
+
+private:
+	static bool m_mouseLeftBtnDown;
+	static int m_mouseX;
+	static int m_mouseY;
+	static int m_mouseDx;
+	static int m_mouseDy;
 };
 
 #endif // InputCapturer_h__

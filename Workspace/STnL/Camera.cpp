@@ -19,6 +19,11 @@ Camera::Camera(const Vector3& position, const Vector3& lookAt, float nearClipDis
 	m_lookAt = lookAt;
 	m_up = Vector3(0.0f, 1.0f, 0.0f);
 
+	Vector3 viewDir = m_lookAt - m_position;
+	Vector3 right = m_up.Cross(viewDir);
+	m_up = viewDir.Cross(right);
+	m_up.Normalize();
+
 	m_distanceToLookAt = (m_lookAt - m_position).Length();
 
 	m_nearClipDistance = nearClipDistance;
@@ -96,13 +101,20 @@ void Camera::Reset( void )
 {
 	m_position = m_init_position;
 	m_lookAt = m_init_lookAt;
+	m_up = Vector3(0.0f, 1.0f, 0.0f);
+
+	Vector3 viewDir = m_lookAt - m_position;
+	Vector3 right = m_up.Cross(viewDir);
+	m_up = viewDir.Cross(right);
+	m_up.Normalize();
+
 	m_viewMatrixDirty = true;
 }
 
 void Camera::LocalRotate( float x, float y )
 {
 	Matrix4 viewSpaceRotation;
-	MakeRotationMatrixX(viewSpaceRotation, 0.0f);
+	MakeRotationMatrixX(viewSpaceRotation, x);
 	
 	Matrix4 viewSpaceRotationY;
 	MakeRotationMatrixY(viewSpaceRotationY, y);
@@ -125,9 +137,11 @@ void Camera::LocalRotate( float x, float y )
 	newWorldSpaceViewDir3.z = newWorldSpaceViewDir.z;
 	newWorldSpaceViewDir3.Normalize();
 
-	if (fabs(newWorldSpaceViewDir3.Dot(m_up)) < 1.0f - 0.0001f)
-	{
-		m_position = m_lookAt - newWorldSpaceViewDir3 * m_distanceToLookAt;
-		m_viewMatrixDirty = true;
-	}	
+	m_position = m_lookAt - newWorldSpaceViewDir3 * m_distanceToLookAt;
+
+	Vector3 right = m_up.Cross(newWorldSpaceViewDir3);
+	m_up = newWorldSpaceViewDir3.Cross(right);
+	m_up.Normalize();
+
+	m_viewMatrixDirty = true;
 }

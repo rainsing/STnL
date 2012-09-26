@@ -12,6 +12,12 @@
 #include "stdafx.h"
 #include "InputCapturer.h"
 
+bool InputCapturer::m_mouseLeftBtnDown = false;
+int InputCapturer::m_mouseX = 0;
+int InputCapturer::m_mouseY = 0;
+int InputCapturer::m_mouseDx = 0;
+int InputCapturer::m_mouseDy = 0;
+
 bool InputCapturer::IsKeyDown( KeyCode keyCode )
 {
 	int virtKey;
@@ -78,4 +84,33 @@ bool InputCapturer::IsKeyPressed( KeyCode keyCode )
 	}
 
 	return (GetAsyncKeyState(virtKey) & 0x0001) != 0;
+}
+
+void InputCapturer::SetLeftBtnDown( bool leftBtnDown )
+{
+	m_mouseLeftBtnDown = leftBtnDown;
+}
+
+void InputCapturer::SetMousePosition( int x, int y )
+{
+	m_mouseDx = x - m_mouseX;
+	m_mouseDy = y - m_mouseY;
+	m_mouseX = x;
+	m_mouseY = y;
+}
+
+bool InputCapturer::IsLeftBtnDown( void )
+{
+	return m_mouseLeftBtnDown;
+}
+
+void InputCapturer::GetMouseMovement( int& dx, int& dy )
+{
+	dx = m_mouseDx;
+	dy = m_mouseDy;
+}
+
+void InputCapturer::ClearMouseMovement( void )
+{
+	m_mouseDx = m_mouseDy = 0;
 }
