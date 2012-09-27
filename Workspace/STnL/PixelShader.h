@@ -23,7 +23,7 @@ public:
 	virtual Vector4 Main(VertexShaderOutput& vertexAttribute) = 0;
 };
 
-class MyPixelShader : public PixelShader
+class PsNormalMap : public PixelShader
 {
 public:
 	virtual Vector4 Main(VertexShaderOutput& vertexAttribute);
@@ -31,6 +31,18 @@ public:
 public:
 	Texture* baseTexture;
 	Texture* normalTexture;
+
+	Vector3 diffuseColor;
+	Vector3 ambientColor;
+};
+
+class PsToonLighting : public PixelShader
+{
+public:
+	virtual Vector4 Main(VertexShaderOutput& vertexAttribute);
+
+public:
+	Texture* baseTexture;
 
 	Vector3 diffuseColor;
 	Vector3 ambientColor;

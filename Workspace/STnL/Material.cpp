@@ -11,3 +11,25 @@
 *********************************************************************/
 #include "stdafx.h"
 #include "Material.h"
+
+#include "Utilities.h"
+
+MaterialManager::MaterialManager( void )
+{
+
+}
+
+MaterialManager::~MaterialManager()
+{
+	for (unsigned i = 0; i < m_matList.size(); i++)
+	{
+		SAFE_DELETE(m_matList[i]);
+	}
+}
+
+Material* MaterialManager::CreateMaterial( void )
+{
+	Material* mat = new Material();
+	m_matList.push_back(mat);
+	return mat;
+}

@@ -363,6 +363,14 @@
 			>
 		</File>
 		<File
+			RelativePath=".\PointLight.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\PointLight.h"
+			>
+		</File>
+		<File
 			RelativePath=".\Renderer.cpp"
 			>
 		</File>

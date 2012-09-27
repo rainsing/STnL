@@ -18,6 +18,7 @@ SceneObject::SceneObject( Mesh* mesh, Material* material )
 	m_material = material;
 	m_worldMatrix = Matrix4::IDENTITY;
 	m_rotationMatrix = Matrix4::IDENTITY;
+	m_hide = true;
 }
 
 void SceneObject::LocalRotate( float x, float y, float z )

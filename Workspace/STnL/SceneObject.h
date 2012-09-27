@@ -27,6 +27,9 @@ public:
 	void GetWorldMatrix(Matrix4& out);
 
 	inline Mesh* GetMesh(void);
+	inline Material* GetMaterial(void);
+	inline void Hide(bool hide);
+	inline bool IsHidden(void);
 
 private:
 	Mesh* m_mesh;
@@ -34,11 +37,28 @@ private:
 
 	Matrix4 m_worldMatrix;
 	Matrix4 m_rotationMatrix;
+
+	bool m_hide;
 };
 
 Mesh* SceneObject::GetMesh( void )
 {
 	return m_mesh;
+}
+
+Material* SceneObject::GetMaterial(void)
+{
+	return m_material;
+}
+
+void SceneObject::Hide( bool hide )
+{
+	m_hide = hide;
+}
+
+bool SceneObject::IsHidden( void )
+{
+	return m_hide;
 }
 
 #endif // SceneObject_h__

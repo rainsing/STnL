@@ -33,6 +33,11 @@ private:
 
 Texture* TextureManager::GetTexture( int index )
 {
+	if (index == -1)
+	{
+		return NULL;
+	}
+
 	return m_textureList[index];
 }
 

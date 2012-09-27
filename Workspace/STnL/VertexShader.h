@@ -38,7 +38,20 @@ public:
 	virtual VertexShaderOutput Main(const Vertex& vertex) = 0;
 };
 
-class MyVertexShader : public VertexShader
+class VsTangentSpaceLighting : public VertexShader
+{
+public:
+	virtual VertexShaderOutput Main(const Vertex& vertex);
+
+public:
+	Matrix4 worldMatrix;
+	Matrix4 inverseWorldMatrix;
+	Matrix4 worldViewProjMatrix;
+
+	Vector3 lightPosition;
+};
+
+class VsTangentSpaceLightingSc2Uv : public VertexShader
 {
 public:
 	virtual VertexShaderOutput Main(const Vertex& vertex);

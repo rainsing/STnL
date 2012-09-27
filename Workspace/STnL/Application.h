@@ -24,6 +24,8 @@ class InputCapturer;
 class Camera;
 class TextOutput;
 class DepthBuffer;
+class MaterialManager;
+class PointLight;
 
 typedef std::vector<SceneObject*> SceneObjectList;
 
@@ -53,8 +55,12 @@ private:
 	TextureManager* m_textureManager;
 	InputCapturer* m_inputCapturer;
 	Camera* m_activeCamera;
+	PointLight* m_activeLight;
 	TextOutput* m_textOutput;
 	DepthBuffer* m_depthBuffer;
+	MaterialManager* m_materialManager;
+
+	unsigned m_activeObjectIndex;
 };
 
 #endif // Application_h__

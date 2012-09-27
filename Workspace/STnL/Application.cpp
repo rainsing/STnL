@@ -13,6 +13,8 @@
 #include "stdafx.h"
 #include "Application.h"
 
+#include "PointLight.h"
+#include "Material.h"
 #include "DepthBuffer.h"
 #include "TextOutput.h"
 #include "Camera.h"
@@ -42,8 +44,10 @@ Application::Application( void )
 	m_textureManager = NULL;
 	m_inputCapturer = NULL;
 	m_activeCamera = NULL;
+	m_activeLight = NULL;
 	m_textOutput = NULL;
 	m_depthBuffer = NULL;
+	m_materialManager = NULL;
 }
 
 Application::~Application()
@@ -66,20 +70,67 @@ void Application::Initialize( HWND hWnd, int windowWidth, int windowHeight )
 	m_meshManager = new MeshManager();
 	m_textureManager = new TextureManager();
 	m_inputCapturer = new InputCapturer();
-	m_activeCamera = new Camera(Vector3(0.0f, 5.0f, -40.0f), Vector3(0.0f, 5.0f, 0.0f), 0.1f, 100.0f, 45.0f, float(windowWidth) / windowHeight);
 	m_textOutput = new TextOutput(hWnd);
 	m_depthBuffer = new DepthBuffer(windowWidth, windowHeight);
-	
-	//Mesh* mesh = m_meshManager->LoadFromFile("..\\Media\\teapot.mesh");
-	//m_textureManager->LoadFromFile("..\\Media\\base.tga");
-	//m_textureManager->LoadFromFile("..\\Media\\normal.tga");
+	m_materialManager = new MaterialManager();
 
-	Mesh* mesh = m_meshManager->LoadFromFile("..\\Media\\marine.mesh");
-	m_textureManager->LoadFromFile("..\\Media\\marine_diffuse.dds");
+	m_textureManager->LoadFromFile("..\\Media\\base.tga");
 	m_textureManager->LoadFromFile("..\\Media\\normal.tga");
+	m_textureManager->LoadFromFile("..\\Media\\marine_diffuse.dds");
 
-	SceneObject* object = new SceneObject(mesh, NULL);
+	// 初始化场景
+	// --begin--
+	SceneObject* object;
+	Mesh* mesh;
+	Material* mat;
+
+	// 物体1：茶壶
+	mesh = m_meshManager->LoadFromFile("..\\Media\\teapot.mesh");
+
+	mat = m_materialManager->CreateMaterial();
+	mat->id = MAT_TEAPOT;
+	mat->baseTextureId = 0;
+	mat->bumpTextureId = 1;
+	mat->vertexShaderId = VS_TANGENT_SPACE_LIGHTING;
+	mat->pixelShaderId = PS_NORMAL_MAP;
+
+	object = new SceneObject(mesh, mat);
 	m_sceneObjectList.push_back(object);
+
+	// 物体2：吉姆雷诺
+	mesh = m_meshManager->LoadFromFile("..\\Media\\marine.mesh");
+
+	mat = m_materialManager->CreateMaterial();
+	mat->id = MAT_MARINE;
+	mat->baseTextureId = 2;
+	mat->bumpTextureId = -1;
+	mat->vertexShaderId = VS_TANGENT_SPACE_LIGHTING_SC2_UV;
+	mat->pixelShaderId = PS_TOON_LIGHTING;
+
+	object = new SceneObject(mesh, mat);
+	m_sceneObjectList.push_back(object);
+
+	// 摄像机
+	m_activeCamera = new Camera(
+		Vector3(0.0f, 5.0f, -40.0f), 
+		Vector3(0.0f, 5.0f, 0.0f), 
+		0.1f, 
+		100.0f, 
+		45.0f, 
+		float(windowWidth) / windowHeight
+	);
+
+	// 光源
+	m_activeLight = new PointLight();
+	m_activeLight->position = Vector3(30.0f, 15.0f, -15.0f);
+	m_activeLight->diffuseColor = Vector3(1.0f, 1.0f, 1.0f);
+	m_activeLight->ambientColor = Vector3(0.1f, 0.1f, 0.1f);
+
+	m_activeObjectIndex = 0;
+	m_sceneObjectList[m_activeObjectIndex]->Hide(false);
+
+	// 初始化场景
+	// --end--
 
 	m_initialized = true;
 }
@@ -97,9 +148,11 @@ void Application::Destroy( void )
 		m_sceneObjectList[i] = NULL;
 	}
 
+	SAFE_DELETE(m_activeLight);
+	SAFE_DELETE(m_activeCamera);
+	SAFE_DELETE(m_materialManager);
 	SAFE_DELETE(m_depthBuffer);
 	SAFE_DELETE(m_textOutput);
-	SAFE_DELETE(m_activeCamera);
 	SAFE_DELETE(m_inputCapturer);
 	SAFE_DELETE(m_textureManager);
 	SAFE_DELETE(m_meshManager);
@@ -124,10 +177,28 @@ void Application::Update( void )
 	char str[256];
 	sprintf_s(str, 256, "FPS: %.1f", 1.0f / dt);
 	m_textOutput->Print(str, 5, 5);
+
+	// 切换当前物体
+	if (m_inputCapturer->IsKeyPressed(KC_C))
+	{
+		m_sceneObjectList[m_activeObjectIndex]->Hide(true);
+
+		if (m_activeObjectIndex < m_sceneObjectList.size() - 1)
+		{
+			m_activeObjectIndex++;
+		}
+		else
+		{
+			m_activeObjectIndex = 0;
+		}
+
+		m_sceneObjectList[m_activeObjectIndex]->Hide(false);
+	}
+
+	SceneObject* object = m_sceneObjectList[m_activeObjectIndex];
 	
 	// 控制物体旋转
 	// --begin--
-	SceneObject* object = m_sceneObjectList[0];
 
 	float rotationX = 0.0f;
 	float rotationY = 0.0f;
@@ -239,28 +310,80 @@ void Application::Render( void )
 	for (unsigned i = 0; i < m_sceneObjectList.size(); i++)
 	{
 		SceneObject* object = m_sceneObjectList[i];
+
+		if (object->IsHidden())
+		{
+			continue;
+		}
+
 		RenderUnit* renderUnit = new RenderUnit();
 
 		renderUnit->m_vb = object->GetMesh()->GetVertexBuffer();
 		renderUnit->m_ib = object->GetMesh()->GetIndexBuffer();
 
-		MyVertexShader* myVS = new MyVertexShader();
-		renderUnit->m_vs = myVS;
+		Material* material = object->GetMaterial();
+		switch (material->vertexShaderId)
+		{
+		case VS_TANGENT_SPACE_LIGHTING:
+			{
+				VsTangentSpaceLighting* myVS = new VsTangentSpaceLighting();
+				renderUnit->m_vs = myVS;
 
-		object->GetWorldMatrix(myVS->worldMatrix);
-		MatrixTranspose(myVS->inverseWorldMatrix, myVS->worldMatrix);	// This only works when there is no translation or scaling!!!
-		myVS->lightPosition = Vector3(30.0f, 15.0f, -15.0f);
+				object->GetWorldMatrix(myVS->worldMatrix);
+				MatrixTranspose(myVS->inverseWorldMatrix, myVS->worldMatrix);	// This only works when there is no translation or scaling!!!
+				myVS->lightPosition = m_activeLight->position;
 
-		MatrixMultiply(myVS->worldViewProjMatrix, myVS->worldMatrix, m_activeCamera->GetViewMatrix());
-		MatrixMultiply(myVS->worldViewProjMatrix, myVS->worldViewProjMatrix, m_activeCamera->GetProjMatrix());
+				MatrixMultiply(myVS->worldViewProjMatrix, myVS->worldMatrix, m_activeCamera->GetViewMatrix());
+				MatrixMultiply(myVS->worldViewProjMatrix, myVS->worldViewProjMatrix, m_activeCamera->GetProjMatrix());
+			}
+			break;
 
-		MyPixelShader* myPS = new MyPixelShader();
-		renderUnit->m_ps = myPS;
+		case VS_TANGENT_SPACE_LIGHTING_SC2_UV:
+			{
+				VsTangentSpaceLightingSc2Uv* myVS = new VsTangentSpaceLightingSc2Uv();
+				renderUnit->m_vs = myVS;
 
-		myPS->baseTexture = m_textureManager->GetTexture(0);
-		myPS->normalTexture = m_textureManager->GetTexture(1);
-		myPS->diffuseColor = Vector3(1.0f, 0.5f, 0.5f);
-		myPS->ambientColor = Vector3(0.4f, 0.4f, 0.4f);
+				object->GetWorldMatrix(myVS->worldMatrix);
+				MatrixTranspose(myVS->inverseWorldMatrix, myVS->worldMatrix);	// This only works when there is no translation or scaling!!!
+				myVS->lightPosition = m_activeLight->position;
+
+				MatrixMultiply(myVS->worldViewProjMatrix, myVS->worldMatrix, m_activeCamera->GetViewMatrix());
+				MatrixMultiply(myVS->worldViewProjMatrix, myVS->worldViewProjMatrix, m_activeCamera->GetProjMatrix());
+			}
+			break;
+
+		default:
+			break;
+		}
+
+		switch (material->pixelShaderId)
+		{
+		case PS_NORMAL_MAP:
+			{
+				PsNormalMap* myPS = new PsNormalMap();
+				renderUnit->m_ps = myPS;
+
+				myPS->baseTexture = m_textureManager->GetTexture(material->baseTextureId);
+				myPS->normalTexture = m_textureManager->GetTexture(material->bumpTextureId);
+				myPS->diffuseColor = m_activeLight->diffuseColor;
+				myPS->ambientColor = m_activeLight->ambientColor;
+			}
+			break;
+
+		case PS_TOON_LIGHTING:
+			{
+				PsToonLighting* myPS = new PsToonLighting();
+				renderUnit->m_ps = myPS;
+
+				myPS->baseTexture = m_textureManager->GetTexture(material->baseTextureId);
+				myPS->diffuseColor = m_activeLight->diffuseColor;
+				myPS->ambientColor = m_activeLight->ambientColor;
+			}
+			break;
+
+		default:
+			break;
+		}
 
 		m_renderer->AddRenderUnit(renderUnit);
 	}
