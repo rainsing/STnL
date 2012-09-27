@@ -37,6 +37,7 @@ Texture* TextureManager::LoadFromFile(const char* fileName)
 	ilGenImages(1, &imageId);
 	ilBindImage(imageId);
 
+	// DevIL这货几乎通吃所有的图片格式，太特么强大了！
 	ilLoadImage(fileName);
 
 	ILint width = ilGetInteger(IL_IMAGE_WIDTH);

@@ -20,41 +20,6 @@ VertexShaderOutput::VertexShaderOutput( void )
 	ZeroMemory(this, sizeof(VertexShaderOutput));
 }
 
-VertexShaderOutput Lerp( VertexShaderOutput& va0, VertexShaderOutput& va1, float t )
-{
-	VertexShaderOutput out;
-
-	// Depth should be linearly interpolated.
-	out.position.z = (va0.position.z - va1.position.z) * t + va1.position.z;
-
-	// texture coordinate interpolation must be perspective-correct
-	float zR0 = 1.0f / va0.position.w;
-	float zR1 = 1.0f / va1.position.w;
-	float zRt = (zR0 - zR1) * t + zR1;
-
-	Vector2 texCoordR0;
-	texCoordR0.x = va0.texCoord.x * zR0;
-	texCoordR0.y = va0.texCoord.y * zR0;
-
-	Vector2 texCoordR1;
-	texCoordR1.x = va1.texCoord.x * zR1;
-	texCoordR1.y = va1.texCoord.y * zR1;
-
-	Vector2 texCoordRt;
-	texCoordRt.x = (texCoordR0.x - texCoordR1.x) * t + texCoordR1.x;
-	texCoordRt.y = (texCoordR0.y - texCoordR1.y) * t + texCoordR1.y;
-
-	out.position.w = 1.0f / zRt;
-
-	out.texCoord.x = texCoordRt.x * out.position.w;
-	out.texCoord.y = texCoordRt.y * out.position.w;
-
-	// linerly interpolate other attributes
-	Lerp(out.attribute0, va0.attribute0, va1.attribute0, t);
-
-	return out;
-}
-
 void Lerp( VertexShaderOutput& out, VertexShaderOutput& va0, VertexShaderOutput& va1, float t )
 {
 	// Depth should be linearly interpolated.
@@ -82,8 +47,15 @@ void Lerp( VertexShaderOutput& out, VertexShaderOutput& va0, VertexShaderOutput&
 	out.texCoord.x = texCoordRt.x * out.position.w;
 	out.texCoord.y = texCoordRt.y * out.position.w;
 
-	// linerly interpolate other attributes
+	// linerly interpolate other attributes for performance's sake
 	Lerp(out.attribute0, va0.attribute0, va1.attribute0, t);
+}
+
+VertexShaderOutput Lerp( VertexShaderOutput& va0, VertexShaderOutput& va1, float t )
+{
+	VertexShaderOutput out;
+	Lerp(out, va0, va1, t);
+	return out;
 }
 
 VertexShaderOutput VsTangentSpaceLighting::Main( const Vertex& vertex )

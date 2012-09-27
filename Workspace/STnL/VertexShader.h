@@ -26,7 +26,6 @@ public:
 	Vector4 position;
 	Vector2 texCoord;
 	Vector4 attribute0;
-	Vector4 attribute1;
 };
 
 VertexShaderOutput Lerp(VertexShaderOutput& va0, VertexShaderOutput& va1, float t);

@@ -97,20 +97,6 @@ void Camera::LocalMove( float x, float y, float z )
 	m_viewMatrixDirty = true;
 }
 
-void Camera::Reset( void )
-{
-	m_position = m_init_position;
-	m_lookAt = m_init_lookAt;
-	m_up = Vector3(0.0f, 1.0f, 0.0f);
-
-	Vector3 viewDir = m_lookAt - m_position;
-	Vector3 right = m_up.Cross(viewDir);
-	m_up = viewDir.Cross(right);
-	m_up.Normalize();
-
-	m_viewMatrixDirty = true;
-}
-
 void Camera::LocalRotate( float x, float y )
 {
 	Matrix4 viewSpaceRotation;
@@ -141,6 +127,20 @@ void Camera::LocalRotate( float x, float y )
 
 	Vector3 right = m_up.Cross(newWorldSpaceViewDir3);
 	m_up = newWorldSpaceViewDir3.Cross(right);
+	m_up.Normalize();
+
+	m_viewMatrixDirty = true;
+}
+
+void Camera::Reset( void )
+{
+	m_position = m_init_position;
+	m_lookAt = m_init_lookAt;
+	m_up = Vector3(0.0f, 1.0f, 0.0f);
+
+	Vector3 viewDir = m_lookAt - m_position;
+	Vector3 right = m_up.Cross(viewDir);
+	m_up = viewDir.Cross(right);
 	m_up.Normalize();
 
 	m_viewMatrixDirty = true;

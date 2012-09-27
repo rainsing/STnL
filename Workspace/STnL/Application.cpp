@@ -52,7 +52,10 @@ Application::Application( void )
 
 Application::~Application()
 {
-
+	if (m_initialized)
+	{
+		Destroy();
+	}
 }
 
 void Application::Initialize( HWND hWnd, int windowWidth, int windowHeight )
@@ -88,27 +91,43 @@ void Application::Initialize( HWND hWnd, int windowWidth, int windowHeight )
 	mesh = m_meshManager->LoadFromFile("..\\Media\\teapot.mesh");
 
 	mat = m_materialManager->CreateMaterial();
-	mat->id = MAT_TEAPOT;
 	mat->baseTextureId = 0;
 	mat->bumpTextureId = 1;
 	mat->vertexShaderId = VS_TANGENT_SPACE_LIGHTING;
 	mat->pixelShaderId = PS_NORMAL_MAP;
+	mat->wireFrame = false;
 
 	object = new SceneObject(mesh, mat);
 	m_sceneObjectList.push_back(object);
 
-	// 物体2：吉姆雷诺
+	// 物体1.5：线框茶壶
+	//mesh = m_meshManager->LoadFromFile("..\\Media\\teapot.mesh");
+
+	mat = m_materialManager->CreateMaterial();
+	mat->baseTextureId = 0;
+	mat->bumpTextureId = 1;
+	mat->vertexShaderId = VS_TANGENT_SPACE_LIGHTING;
+	mat->pixelShaderId = PS_NORMAL_MAP;
+	mat->wireFrame = true;
+
+	object = new SceneObject(mesh, mat);
+	m_sceneObjectList.push_back(object);
+
+	// 物体2：机枪兵儿
 	mesh = m_meshManager->LoadFromFile("..\\Media\\marine.mesh");
 
 	mat = m_materialManager->CreateMaterial();
-	mat->id = MAT_MARINE;
 	mat->baseTextureId = 2;
 	mat->bumpTextureId = -1;
 	mat->vertexShaderId = VS_TANGENT_SPACE_LIGHTING_SC2_UV;
 	mat->pixelShaderId = PS_TOON_LIGHTING;
+	mat->wireFrame = false;
 
 	object = new SceneObject(mesh, mat);
 	m_sceneObjectList.push_back(object);
+
+	m_activeObjectIndex = 0;
+	m_sceneObjectList[m_activeObjectIndex]->Hide(false);
 
 	// 摄像机
 	m_activeCamera = new Camera(
@@ -125,9 +144,6 @@ void Application::Initialize( HWND hWnd, int windowWidth, int windowHeight )
 	m_activeLight->position = Vector3(30.0f, 15.0f, -15.0f);
 	m_activeLight->diffuseColor = Vector3(1.0f, 1.0f, 1.0f);
 	m_activeLight->ambientColor = Vector3(0.1f, 0.1f, 0.1f);
-
-	m_activeObjectIndex = 0;
-	m_sceneObjectList[m_activeObjectIndex]->Hide(false);
 
 	// 初始化场景
 	// --end--
@@ -158,6 +174,8 @@ void Application::Destroy( void )
 	SAFE_DELETE(m_meshManager);
 	SAFE_DELETE(m_renderer);
 	SAFE_DELETE(m_backBuffer);
+
+	m_initialized = false;
 }
 
 void Application::Update( void )
@@ -310,6 +328,7 @@ void Application::Render( void )
 	for (unsigned i = 0; i < m_sceneObjectList.size(); i++)
 	{
 		SceneObject* object = m_sceneObjectList[i];
+		Material* material = object->GetMaterial();
 
 		if (object->IsHidden())
 		{
@@ -320,8 +339,8 @@ void Application::Render( void )
 
 		renderUnit->m_vb = object->GetMesh()->GetVertexBuffer();
 		renderUnit->m_ib = object->GetMesh()->GetIndexBuffer();
+		renderUnit->m_wireFrame = material->wireFrame;
 
-		Material* material = object->GetMaterial();
 		switch (material->vertexShaderId)
 		{
 		case VS_TANGENT_SPACE_LIGHTING:
@@ -330,11 +349,12 @@ void Application::Render( void )
 				renderUnit->m_vs = myVS;
 
 				object->GetWorldMatrix(myVS->worldMatrix);
-				MatrixTranspose(myVS->inverseWorldMatrix, myVS->worldMatrix);	// This only works when there is no translation or scaling!!!
-				myVS->lightPosition = m_activeLight->position;
-
+				MatrixTranspose(myVS->inverseWorldMatrix, myVS->worldMatrix);	// This only works when there is no translation 
+																				// or scaling!!!
 				MatrixMultiply(myVS->worldViewProjMatrix, myVS->worldMatrix, m_activeCamera->GetViewMatrix());
 				MatrixMultiply(myVS->worldViewProjMatrix, myVS->worldViewProjMatrix, m_activeCamera->GetProjMatrix());
+
+				myVS->lightPosition = m_activeLight->position;
 			}
 			break;
 
@@ -344,11 +364,12 @@ void Application::Render( void )
 				renderUnit->m_vs = myVS;
 
 				object->GetWorldMatrix(myVS->worldMatrix);
-				MatrixTranspose(myVS->inverseWorldMatrix, myVS->worldMatrix);	// This only works when there is no translation or scaling!!!
-				myVS->lightPosition = m_activeLight->position;
-
+				MatrixTranspose(myVS->inverseWorldMatrix, myVS->worldMatrix);	// This only works when there is no translation 
+																				// or scaling!!!
 				MatrixMultiply(myVS->worldViewProjMatrix, myVS->worldMatrix, m_activeCamera->GetViewMatrix());
 				MatrixMultiply(myVS->worldViewProjMatrix, myVS->worldViewProjMatrix, m_activeCamera->GetProjMatrix());
+
+				myVS->lightPosition = m_activeLight->position;
 			}
 			break;
 

@@ -28,13 +28,16 @@ public:
 	void Reset(void);
 
 private:
+	const Vector3 m_init_position;
+	const Vector3 m_init_lookAt;
+
 	Vector3 m_position;
 	Vector3 m_lookAt;
 	Vector3 m_up;
 	float m_distanceToLookAt;
 
 	Matrix4 m_viewMatrix;
-	bool m_viewMatrixDirty;
+	bool m_viewMatrixDirty;		// will re-calculate the matrix if this is set
 
 	float m_nearClipDistance;
 	float m_farClipDistance;
@@ -42,10 +45,7 @@ private:
 	float m_aspect;
 
 	Matrix4 m_projMatrix;
-	bool m_projMatrixDirty;
-
-	const Vector3 m_init_position;
-	const Vector3 m_init_lookAt;
+	bool m_projMatrixDirty;		// will re-calculate the matrix if this is set
 };
 
 #endif // Camera_h__

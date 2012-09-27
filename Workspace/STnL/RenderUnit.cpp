@@ -22,6 +22,7 @@ RenderUnit::RenderUnit( void )
 	m_ib = NULL;
 	m_vs = NULL;
 	m_ps = NULL;
+	m_wireFrame = false;
 }
 
 RenderUnit::~RenderUnit()

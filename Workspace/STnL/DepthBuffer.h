@@ -24,7 +24,7 @@ public:
 private:
 	int m_width;
 	int m_height;
-	float* m_depthData;
+	float* m_depthData;		// 32bit的深度缓冲没太大必要，可谁让C++没有“半精度”浮点呢……
 };
 
 #endif // DepthBuffer_h__

@@ -27,6 +27,7 @@ public:
 	IndexBuffer* m_ib;
 	VertexShader* m_vs;
 	PixelShader* m_ps;
+	bool m_wireFrame;
 };
 
 #endif // RenderUnit_h__

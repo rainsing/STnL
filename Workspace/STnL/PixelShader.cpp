@@ -57,6 +57,7 @@ Vector4 PsToonLighting::Main( VertexShaderOutput& vertexAttribute )
 
 	Vector3 lighting = diffuseColor * angle + ambientColor * 2.0f;
 
+	// 把光照离散化，达到卡通的效果
 	lighting.x -= fmod(lighting.x, 0.2f);
 	lighting.y -= fmod(lighting.y, 0.2f);
 	lighting.z -= fmod(lighting.z, 0.2f);

@@ -26,21 +26,14 @@ enum PixelShaderId
 	PS_TOON_LIGHTING
 };
 
-enum MaterialId
-{
-	MAT_TEAPOT,
-	MAT_MARINE
-};
-
 class Material
 {
 public:
-	int id;
-
 	int baseTextureId;
 	int bumpTextureId;
 	int vertexShaderId;
 	int pixelShaderId;
+	bool wireFrame;
 };
 
 typedef std::vector<Material*> MaterialList;

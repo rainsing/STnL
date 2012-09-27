@@ -44,11 +44,13 @@ bool DepthBuffer::TestDepth( int x, int y, float depth )
 		return false;
 	}
 
-	bool pass = depth < m_depthData[y * m_width + x];
+	float& depthInBuffer = m_depthData[y * m_width + x];
+	bool pass = depth < depthInBuffer;
 
+	// 通过了测试就写深度
 	if (pass)
 	{
-		m_depthData[y * m_width + x] = depth;
+		depthInBuffer = depth;
 	}
 
 	return pass;

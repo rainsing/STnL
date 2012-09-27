@@ -32,6 +32,7 @@ void Renderer::SetRenderTarget( BackBuffer* renderTarget, DepthBuffer* depthBuff
 	m_depthBuffer = depthBuffer;
 }
 
+// 经典的整数Bresenham算法
 void Renderer::DrawLine( int x0, int y0, int x1, int y1, Color color )
 {
 	bool steep = abs(y1 - y0) > abs(x1 - x0);
@@ -135,14 +136,7 @@ void Renderer::Render( void )
 			VertexShaderOutput& v1 = vsOuts[triangles[j].iV1];
 			VertexShaderOutput& v2 = vsOuts[triangles[j].iV2];
 
-			/*if (j != 105)
-			{
-				continue;
-			}*/
-
-			bool wireFrameMode = false;
-
-			if (wireFrameMode)	// fill mode: wireframe
+			if (renderUnit->m_wireFrame)	// fill mode: wireframe
 			{
 				int x0 = int(v0.position.x);
 				int y0 = int(v0.position.y);
