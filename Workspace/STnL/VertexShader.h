@@ -37,6 +37,32 @@ public:
 	virtual VertexShaderOutput Main(const Vertex& vertex) = 0;
 };
 
+class VsFixedFunction : public VertexShader
+{
+public:
+	virtual VertexShaderOutput Main(const Vertex& vertex);
+
+public:
+	Matrix4 inverseWorldMatrix;
+	Matrix4 worldViewProjMatrix;
+	Vector3 lightPosition;
+	Vector3 diffuseColor;
+	Vector3 ambientColor;
+};
+
+class VsFixedFunctionAltUv : public VertexShader
+{
+public:
+	virtual VertexShaderOutput Main(const Vertex& vertex);
+
+public:
+	Matrix4 inverseWorldMatrix;
+	Matrix4 worldViewProjMatrix;
+	Vector3 lightPosition;
+	Vector3 diffuseColor;
+	Vector3 ambientColor;
+};
+
 class VsTangentSpaceLighting : public VertexShader
 {
 public:

@@ -9,4 +9,5 @@
 	
 	purpose:	Ò»Ð©helperº¯Êý
 *********************************************************************/
+#include "stdafx.h"
 #include "Utilities.h"

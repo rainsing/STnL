@@ -12,8 +12,6 @@
 #ifndef Utilities_h__
 #define Utilities_h__
 
-#include <xmmintrin.h>
-
 #define PI 3.141592653f
 
 #define GET_X_LPARAM(lp)                        ((int)(short)LOWORD(lp))
@@ -66,12 +64,12 @@ inline int Float2Int(float val)
 }
 
 // SSEœﬂ–‘≤Â÷µ
-inline void Lerp_SSE(__m128& out, __m128& v0, __m128& v1, __m128& t)
-{
-	out = _mm_sub_ps(v0, v1);
-	out = _mm_mul_ps(out, t);
-	out = _mm_add_ps(out, v1);
-}
+//inline void Lerp_SSE(__m128& out, __m128& v0, __m128& v1, __m128& t)
+//{
+//	out = _mm_sub_ps(v0, v1);
+//	out = _mm_mul_ps(out, t);
+//	out = _mm_add_ps(out, v1);
+//}
 
 // clamp
 inline float& Clamp(float& value, float minValue, float maxValue)

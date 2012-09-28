@@ -13,7 +13,6 @@
 #include "Vector.h"
 
 #include "Utilities.h"
-#include <xmmintrin.h>
 
 const Vector3 Vector3::ZERO(0.0f, 0.0f, 0.0f);
 

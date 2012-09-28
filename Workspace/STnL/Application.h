@@ -13,8 +13,6 @@
 #ifndef Application_h__
 #define Application_h__
 
-#include <vector>
-
 class BackBuffer;
 class Renderer;
 class SceneObject;

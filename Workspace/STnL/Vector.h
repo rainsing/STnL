@@ -12,8 +12,6 @@
 #ifndef Vector_h__
 #define Vector_h__
 
-#include <math.h>
-
 class Vector4;
 
 class Vector2

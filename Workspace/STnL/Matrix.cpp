@@ -14,8 +14,6 @@
 
 #include "Utilities.h"
 
-#include <math.h>
-
 const Matrix4 Matrix4::IDENTITY(
 	1.0f, 0.0f, 0.0f, 0.0f,
 	0.0f, 1.0f, 0.0f, 0.0f,

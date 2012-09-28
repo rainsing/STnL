@@ -246,14 +246,16 @@
 			Name="Third Party"
 			>
 			<File
-				RelativePath=".\ObjMeshLoader.cpp"
+				RelativePath=".\mmgr.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="MEM_MNG"
 						UsePrecompiledHeader="0"
+						DisableSpecificWarnings="4996"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -261,7 +263,37 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="MEM_MNG"
 						UsePrecompiledHeader="0"
+						DisableSpecificWarnings="4996"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\mmgr.h"
+				>
+			</File>
+			<File
+				RelativePath=".\nommgr.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ObjMeshLoader.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="2"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="2"
 					/>
 				</FileConfiguration>
 			</File>
@@ -377,7 +409,7 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"
+						UsePrecompiledHeader="2"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -385,7 +417,7 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"
+						UsePrecompiledHeader="2"
 					/>
 				</FileConfiguration>
 			</File>

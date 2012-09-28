@@ -26,6 +26,7 @@ enum KeyCode
 	KC_E,
 	KC_R,
 	KC_C,
+	KC_T
 };
 
 class InputCapturer

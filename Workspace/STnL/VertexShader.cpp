@@ -58,6 +58,64 @@ VertexShaderOutput Lerp( VertexShaderOutput& va0, VertexShaderOutput& va1, float
 	return out;
 }
 
+VertexShaderOutput VsFixedFunction::Main( const Vertex& vertex )
+{
+	VertexShaderOutput output;
+
+	// clip space position
+	output.position = worldViewProjMatrix.Transform(vertex.position);
+
+	// uv
+	output.texCoord.x = vertex.texCoord.x;
+	output.texCoord.y = vertex.texCoord.y;
+
+	// lighting
+	Vector4& objSpaceLightPos = inverseWorldMatrix.Transform(lightPosition);
+
+	Vector3 objSpaceLightDir;
+	objSpaceLightDir.x = objSpaceLightPos.x;
+	objSpaceLightDir.y = objSpaceLightPos.y;
+	objSpaceLightDir.z = objSpaceLightPos.z;
+	objSpaceLightDir = objSpaceLightDir - vertex.position;
+	objSpaceLightDir.Normalize();
+
+	float angle = vertex.normal.Dot(objSpaceLightDir);
+	Saturate(angle);
+
+	output.attribute0 = diffuseColor * angle + ambientColor;
+
+	return output;
+}
+
+VertexShaderOutput VsFixedFunctionAltUv::Main( const Vertex& vertex )
+{
+	VertexShaderOutput output;
+
+	// clip space position
+	output.position = worldViewProjMatrix.Transform(vertex.position);
+
+	// StarCraft 2 uses a strange UV coordinate system
+	output.texCoord.x = vertex.texCoord.x * 2.0f;
+	output.texCoord.y = 1.0f - vertex.texCoord.y;
+
+	// lighting
+	Vector4& objSpaceLightPos = inverseWorldMatrix.Transform(lightPosition);
+
+	Vector3 objSpaceLightDir;
+	objSpaceLightDir.x = objSpaceLightPos.x;
+	objSpaceLightDir.y = objSpaceLightPos.y;
+	objSpaceLightDir.z = objSpaceLightPos.z;
+	objSpaceLightDir = objSpaceLightDir - vertex.position;
+	objSpaceLightDir.Normalize();
+
+	float angle = vertex.normal.Dot(objSpaceLightDir);
+	Saturate(angle);
+
+	output.attribute0 = diffuseColor * angle + ambientColor;
+
+	return output;
+}
+
 VertexShaderOutput VsTangentSpaceLighting::Main( const Vertex& vertex )
 {
 	VertexShaderOutput output;

@@ -83,6 +83,10 @@ bool InputCapturer::IsKeyPressed( KeyCode keyCode )
 		virtKey = 'C';
 		break;
 
+	case KC_T:
+		virtKey = 'T';
+		break;
+
 	default:
 		return false;
 	}

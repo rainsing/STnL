@@ -22,13 +22,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+#include "stdafx.h"
 #include "Mesh.h"
 #include "Vertex.h"
-
-#include <string>
-#include <vector>
-#include <sstream>
-#include <fstream>
 
 #define TOKEN_VERTEX_POS "v"
 #define TOKEN_VERTEX_NOR "vn"

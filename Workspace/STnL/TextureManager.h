@@ -12,8 +12,6 @@
 #ifndef TextureManager_h__
 #define TextureManager_h__
 
-#include <vector>
-
 class Texture;
 
 typedef std::vector<Texture*> TextureList;

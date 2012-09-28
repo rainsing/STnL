@@ -12,16 +12,17 @@
 #ifndef Material_h__
 #define Material_h__
 
-#include <vector>
-
 enum VertexShaderId
 {
+	VS_FIXED_FUNCTION,
+	VS_FIXED_FUNCTION_ALT_UV,
 	VS_TANGENT_SPACE_LIGHTING,
 	VS_TANGENT_SPACE_LIGHTING_SC2_UV
 };
 
 enum PixelShaderId
 {
+	PS_FIXED_FUNCTION,
 	PS_NORMAL_MAP,
 	PS_TOON_LIGHTING
 };

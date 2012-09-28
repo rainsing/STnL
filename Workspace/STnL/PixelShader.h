@@ -23,6 +23,15 @@ public:
 	virtual Vector4 Main(VertexShaderOutput& vertexAttribute) = 0;
 };
 
+class PsFixedFunction : public PixelShader
+{
+public:
+	virtual Vector4 Main(VertexShaderOutput& vertexAttribute);
+
+public:
+	Texture* baseTexture;
+};
+
 class PsNormalMap : public PixelShader
 {
 public:

@@ -14,8 +14,6 @@
 
 #include "VertexShader.h"
 
-#include <vector>
-
 class BackBuffer;
 class RenderUnit;
 class PixelShader;
@@ -24,10 +22,29 @@ class DepthBuffer;
 class Renderer
 {
 public:
+	enum CullMode
+	{
+		CULL_MODE_CW,
+		CULL_MODE_CCW,
+		CULL_MODE_NONE
+	};
+
+	enum ShadeMode
+	{
+		SHADING_MODE_START = 0,
+		SHADING_MODE_FLAT,
+		SHADING_MODE_GOURAUD,
+		SHADING_MODE_PHONG,
+		SHADING_MODE_MAX
+	};
+
+public:
 	Renderer(void);
 
 	void SetRenderTarget(BackBuffer* renderTarget, DepthBuffer* depthBuffer);
 	void AddRenderUnit(RenderUnit* renderUnit);
+	void SetShadeMode(ShadeMode shadeMode);
+	ShadeMode GetShadeMode(void);
 	void Render(void);
 
 private:
@@ -36,18 +53,12 @@ private:
 		unsigned short iV0;
 		unsigned short iV1;
 		unsigned short iV2;
+		Vector3 lighting;
 	};
 
 	typedef std::vector<RenderUnit*> RenderUnitList;
 	typedef std::vector<VertexShaderOutput> VsOutList;
 	typedef std::vector<Triangle> TriangleList;
-
-	enum CullMode
-	{
-		CULL_MODE_CW,
-		CULL_MODE_CCW,
-		CULL_MODE_NONE
-	};
 
 private:
 	bool TrivialReject(Triangle& triangle, VsOutList& vsOuts);
@@ -63,6 +74,9 @@ private:
 	BackBuffer* m_renderTarget;
 	DepthBuffer* m_depthBuffer;
 	RenderUnitList m_renderUnitList;
+
+	CullMode m_cullMode;
+	ShadeMode m_shadeMode;
 };
 
 #endif // Renderer_h__

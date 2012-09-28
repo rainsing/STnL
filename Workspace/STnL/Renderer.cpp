@@ -12,6 +12,7 @@
 #include "stdafx.h"
 #include "Renderer.h"
 
+#include "Vertex.h"
 #include "DepthBuffer.h"
 #include "RenderUnit.h"
 #include "VertexShader.h"
@@ -24,6 +25,9 @@
 Renderer::Renderer( void )
 {
 	m_renderTarget = NULL;
+
+	m_cullMode = CULL_MODE_CCW;
+	m_shadeMode = SHADING_MODE_PHONG;
 }
 
 void Renderer::SetRenderTarget( BackBuffer* renderTarget, DepthBuffer* depthBuffer )
@@ -97,17 +101,37 @@ void Renderer::Render( void )
 			{
 				continue;
 			}
-			else if (RemoveBackface(tri, vsOuts, CULL_MODE_CCW))
+			else if (RemoveBackface(tri, vsOuts, m_cullMode))
 			{
 				continue;
 			}
-			else if (TrivialAccept(tri, vsOuts))
+			/*else if (TrivialAccept(tri, vsOuts))
 			{
 				triangles.push_back(tri);
-			}
+			}*/
 			else
 			{
-				// TODO: do clipping here
+				if (m_shadeMode == SHADING_MODE_FLAT) 
+				{
+					Vertex v0 = (*renderUnit->m_vb)[tri.iV0];
+					Vertex& v1 = (*renderUnit->m_vb)[tri.iV1];
+					Vertex& v2 = (*renderUnit->m_vb)[tri.iV2];
+
+					Vector3& edge0 = v1.position - v0.position;
+					Vector3& edge1 = v2.position - v1.position;
+					Vector3& faceNormal = edge0.Cross(edge1);
+					faceNormal.Normalize();
+
+					v0.normal = faceNormal;
+					v0.position = (v0.position + v1.position + v2.position) * (1.0f / 3.0f);
+
+					VertexShaderOutput& out = renderUnit->m_vs->Main(v0);
+
+					tri.lighting.x = out.attribute0.x;
+					tri.lighting.y = out.attribute0.y;
+					tri.lighting.z = out.attribute0.z;
+				}
+
 				triangles.push_back(tri);
 			}
 		}
@@ -220,6 +244,13 @@ void Renderer::Render( void )
 					VertexShaderOutput& va2 = y < midY
 						? Lerp(*sv, *mv, (mv->position.y - fY) / msY)
 						: Lerp(*mv, *ev, (ev->position.y - fY) / emY);
+
+					if (m_shadeMode == SHADING_MODE_FLAT)
+					{
+						va1.attribute0.x = va2.attribute0.x = triangles[j].lighting.x;
+						va1.attribute0.y = va2.attribute0.y = triangles[j].lighting.x;
+						va1.attribute0.z = va2.attribute0.z = triangles[j].lighting.x;
+					}
 
 					if (x1 < x2)
 					{
@@ -410,4 +441,14 @@ void Renderer::FillSpan( float x0, float x1, int y, VertexShaderOutput& va0, Ver
 		int b = Float2Int(color.z * 255.0f);
 		m_renderTarget->SetPixel(x, y, COLOR_RGB(r, g, b));
 	}
+}
+
+void Renderer::SetShadeMode( ShadeMode shadeMode )
+{
+	m_shadeMode = shadeMode;
+}
+
+Renderer::ShadeMode Renderer::GetShadeMode( void )
+{
+	return m_shadeMode;
 }

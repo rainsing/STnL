@@ -12,8 +12,6 @@
 #ifndef MeshManager_h__
 #define MeshManager_h__
 
-#include <vector>
-
 class Mesh;
 
 typedef std::vector<Mesh*> MeshList;

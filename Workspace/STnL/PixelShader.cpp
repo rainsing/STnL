@@ -16,6 +16,17 @@
 #include "VertexShader.h"
 #include "Utilities.h"
 
+Vector4 PsFixedFunction::Main( VertexShaderOutput& vertexAttribute )
+{
+	Vector4& baseColor = baseTexture->Sample(vertexAttribute.texCoord.x, vertexAttribute.texCoord.y);
+
+	baseColor.x *= vertexAttribute.attribute0.x;
+	baseColor.y *= vertexAttribute.attribute0.y;
+	baseColor.z *= vertexAttribute.attribute0.z;
+
+	return Saturate(baseColor);
+}
+
 Vector4 PsNormalMap::Main( VertexShaderOutput& vertexAttribute )
 {
 	Vector4& baseColor = baseTexture->Sample(vertexAttribute.texCoord.x, vertexAttribute.texCoord.y);
