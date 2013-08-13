@@ -1,0 +1,217 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Framework">
+      <UniqueIdentifier>{ddb2f078-955e-48cd-b398-865332e76bac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource">
+      <UniqueIdentifier>{b4d6df4b-adda-4743-b706-7276c990fbf5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Third Party">
+      <UniqueIdentifier>{5e865577-c1b0-4a3d-8112-056e99135eda}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Application">
+      <UniqueIdentifier>{94267ff0-6e64-42b4-bdbe-f760a8ea2979}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Math &amp; Misc">
+      <UniqueIdentifier>{fb7a6c2c-a372-47c6-9fba-94a20ff323e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderer">
+      <UniqueIdentifier>{54f735b1-5f22-4ed9-a64f-54b8f57919f6}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Resource.h">
+      <Filter>Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="STnL.h">
+      <Filter>Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="mmgr.h">
+      <Filter>Third Party</Filter>
+    </ClInclude>
+    <ClInclude Include="nommgr.h">
+      <Filter>Third Party</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjMeshLoader.h">
+      <Filter>Third Party</Filter>
+    </ClInclude>
+    <ClInclude Include="Application.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="InputCapturer.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="Material.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="MeshManager.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="PointLight.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneObject.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="TextOutput.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureManager.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="Matrix.h">
+      <Filter>Math &amp; Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Types.h">
+      <Filter>Math &amp; Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Utilities.h">
+      <Filter>Math &amp; Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector.h">
+      <Filter>Math &amp; Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="BackBuffer.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="DepthBuffer.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="IndexBuffer.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="PixelShader.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderUnit.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Vertex.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexBuffer.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexShader.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="STnL.cpp">
+      <Filter>Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="mmgr.cpp">
+      <Filter>Third Party</Filter>
+    </ClCompile>
+    <ClCompile Include="ObjMeshLoader.cpp">
+      <Filter>Third Party</Filter>
+    </ClCompile>
+    <ClCompile Include="Application.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="InputCapturer.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="Material.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="Mesh.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="MeshManager.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="PointLight.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneObject.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="TextOutput.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="TextureManager.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="Matrix.cpp">
+      <Filter>Math &amp; Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="Utilities.cpp">
+      <Filter>Math &amp; Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="Vector.cpp">
+      <Filter>Math &amp; Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="BackBuffer.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="DepthBuffer.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="IndexBuffer.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="PixelShader.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderUnit.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Vertex.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="VertexBuffer.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="VertexShader.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="small.ico">
+      <Filter>Resource</Filter>
+    </Image>
+    <Image Include="STnL.ico">
+      <Filter>Resource</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="STnL.rc">
+      <Filter>Resource</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+</Project>
