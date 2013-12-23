@@ -1,5 +1,1 @@
-STnL
-====
-
-STnl stands for Software Transform and Lighting. You are right. It's a software renderer. For fun.
-The first modification.
+STnl stands for Software Transform and Lighting. It's a simple software renderer / rasterizer that demonstrates the basic principles of a programmable GPU.
