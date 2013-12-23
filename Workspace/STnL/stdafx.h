@@ -14,9 +14,9 @@
 // C RunTime Header Files
 #ifdef _DEBUG
 
-//#define _CRTDBG_MAP_ALLOC
-//#include <stdlib.h>
-//#include <crtdbg.h>
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
 
 #endif
 
@@ -32,8 +32,4 @@
 #include <fstream>
 
 // TODO: reference additional headers your program requires here
-//#ifndef _DEBUG
-	#include "mmgr.h"
-//#endif
-
 #include "Types.h"

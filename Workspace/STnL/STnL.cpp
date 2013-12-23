@@ -87,9 +87,9 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 		application.Destroy();
 	}
 
-//#ifdef _DEBUG
-//	_CrtDumpMemoryLeaks();
-//#endif
+#ifdef _DEBUG
+	_CrtDumpMemoryLeaks();
+#endif
 
 	return (int) msg.wParam;
 }

@@ -33,12 +33,6 @@
     <ClInclude Include="targetver.h">
       <Filter>Framework</Filter>
     </ClInclude>
-    <ClInclude Include="mmgr.h">
-      <Filter>Third Party</Filter>
-    </ClInclude>
-    <ClInclude Include="nommgr.h">
-      <Filter>Third Party</Filter>
-    </ClInclude>
     <ClInclude Include="ObjMeshLoader.h">
       <Filter>Third Party</Filter>
     </ClInclude>
@@ -121,9 +115,6 @@
     </ClCompile>
     <ClCompile Include="STnL.cpp">
       <Filter>Framework</Filter>
-    </ClCompile>
-    <ClCompile Include="mmgr.cpp">
-      <Filter>Third Party</Filter>
     </ClCompile>
     <ClCompile Include="ObjMeshLoader.cpp">
       <Filter>Third Party</Filter>
