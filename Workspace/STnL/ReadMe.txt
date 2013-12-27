@@ -1,9 +1,7 @@
-控制方法：
+Key Bindings：
 
-左键拖动	- 旋转摄像机
-A, D		- 左右移动摄像机
-W, S		- 前后移动摄像机
-E, Q		- 上下移动摄像机
-方向键		- 旋转模型
-R			- 重置模型和摄像机
-C			- 切换到下一个模型
+Left mouse button drag	- Rotate camera
+A, D, W, S, E, Q	- Move camera
+Arrow keys		- Rotate object
+R			- Reset object and camera
+C			- Next object
