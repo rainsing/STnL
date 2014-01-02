@@ -7,8 +7,11 @@
 	file ext:	cpp
 	author:		Rainsing
 	
-	purpose:	存储一些应用程序的全局对象，实现应用程序的Init, Update,
-				Render, Destory函数由WinMain调用
+    purpose:	Top level appication class. Initialization and clean-up
+                of the whole app are done in this class. It creates the
+                scene, updates it with user input, and then tells the
+                underlying renderer to render it. This class also serves
+                as a hub for singleton 'manager' classes.
 *********************************************************************/
 #include "stdafx.h"
 #include "Application.h"
@@ -77,22 +80,22 @@ void Application::Initialize( HWND hWnd, int windowWidth, int windowHeight )
 	m_depthBuffer = new DepthBuffer(windowWidth, windowHeight);
 	m_materialManager = new MaterialManager();
 
-	m_textureManager->LoadFromFile("..\\Media\\base.tga");
-	m_textureManager->LoadFromFile("..\\Media\\normal.tga");
-	m_textureManager->LoadFromFile("..\\Media\\marine_diffuse.dds");
+    int baseTextureId = m_textureManager->LoadFromFile("..\\Media\\base.tga");
+    int bumpTextureId = m_textureManager->LoadFromFile("..\\Media\\normal.tga");
+    int baseTextureId2 = m_textureManager->LoadFromFile("..\\Media\\ninja_head.dds");
 
-	// 初始化场景
+	// scene initialization
 	// --begin--
 	SceneObject* object;
 	Mesh* mesh;
 	Material* mat;
 
-	// 物体1：茶壶
+	// object1：teapot
 	mesh = m_meshManager->LoadFromFile("..\\Media\\teapot.mesh");
 
 	mat = m_materialManager->CreateMaterial();
-	mat->baseTextureId = 0;
-	mat->bumpTextureId = 1;
+	mat->baseTextureId = baseTextureId;
+	mat->bumpTextureId = bumpTextureId;
 	mat->vertexShaderId = VS_TANGENT_SPACE_LIGHTING;
 	mat->pixelShaderId = PS_NORMAL_MAP;
 	mat->wireFrame = false;
@@ -100,26 +103,13 @@ void Application::Initialize( HWND hWnd, int windowWidth, int windowHeight )
 	object = new SceneObject(mesh, mat);
 	m_sceneObjectList.push_back(object);
 
-	// 物体1.5：线框茶壶
-	//mesh = m_meshManager->LoadFromFile("..\\Media\\teapot.mesh");
+	// object2：ninja head
+	mesh = m_meshManager->LoadFromFile("..\\Media\\ninjaHead.mesh");
 
 	mat = m_materialManager->CreateMaterial();
-	mat->baseTextureId = 0;
-	mat->bumpTextureId = 1;
-	mat->vertexShaderId = VS_TANGENT_SPACE_LIGHTING;
-	mat->pixelShaderId = PS_NORMAL_MAP;
-	mat->wireFrame = true;
-
-	object = new SceneObject(mesh, mat);
-	m_sceneObjectList.push_back(object);
-
-	// 物体2：机枪兵儿
-	mesh = m_meshManager->LoadFromFile("..\\Media\\marine.mesh");
-
-	mat = m_materialManager->CreateMaterial();
-	mat->baseTextureId = 2;
+	mat->baseTextureId = baseTextureId2;
 	mat->bumpTextureId = -1;
-	mat->vertexShaderId = VS_TANGENT_SPACE_LIGHTING_SC2_UV;
+	mat->vertexShaderId = VS_TANGENT_SPACE_LIGHTING;
 	mat->pixelShaderId = PS_TOON_LIGHTING;
 	mat->wireFrame = false;
 
@@ -129,7 +119,7 @@ void Application::Initialize( HWND hWnd, int windowWidth, int windowHeight )
 	m_activeObjectIndex = 0;
 	m_sceneObjectList[m_activeObjectIndex]->Hide(false);
 
-	// 摄像机
+	// camera
 	m_activeCamera = new Camera(
 		Vector3(0.0f, 5.0f, -40.0f), 
 		Vector3(0.0f, 5.0f, 0.0f), 
@@ -139,13 +129,13 @@ void Application::Initialize( HWND hWnd, int windowWidth, int windowHeight )
 		float(windowWidth) / windowHeight
 	);
 
-	// 光源
+	// light source
 	m_activeLight = new PointLight();
 	m_activeLight->position = Vector3(30.0f, 15.0f, -15.0f);
 	m_activeLight->diffuseColor = Vector3(1.0f, 1.0f, 1.0f);
 	m_activeLight->ambientColor = Vector3(0.1f, 0.1f, 0.1f);
 
-	// 初始化场景
+	// scene initialization
 	// --end--
 
 	m_initialized = true;
@@ -323,11 +313,24 @@ void Application::Update( void )
 	// 控制摄像机旋转
 	// --end--
 
+    if (m_inputCapturer->IsRightBtnDown())
+    {
+        int dx, dy;
+        m_inputCapturer->GetMouseMovement(dx, dy);
+
+        if (dx != 0 || dy != 0)
+        {
+            m_activeLight->position.x += dx * 0.5f;
+            m_activeLight->position.y -= dy * 0.5f;
+        }
+    }
+
 	// 重置场景
 	if (m_inputCapturer->IsKeyPressed(KC_R))
 	{
 		object->ResetRotation();
 		m_activeCamera->Reset();
+        m_activeLight->position = Vector3(30.0f, 15.0f, -15.0f);
 	}
 
 	m_inputCapturer->ClearMouseMovement();

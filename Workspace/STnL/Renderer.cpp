@@ -398,19 +398,18 @@ bool Renderer::RemoveBackface( Triangle& triangle, VsOutList& vsOuts, CullMode c
 
 	Vector3 faceNormal = e1.Cross(e2);
 
-	// 顺带在这儿移除所有的退化三角形
-	if (faceNormal.Equal(Vector3::ZERO, 0.0001f))
-	{
-		return true;
-	}
+    if (faceNormal.Equal(Vector3::ZERO, 0.0001f))
+    {
+        return false;
+    }
 
 	if (cullMode == CULL_MODE_CCW)
 	{
-		return faceNormal.z > 0;
+		return faceNormal.z > 0.0f;
 	}
 	else
 	{
-		return faceNormal.z < 0;
+		return faceNormal.z < 0.0f;
 	}
 }
 

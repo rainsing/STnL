@@ -7,8 +7,11 @@
 	file ext:	h
 	author:		Rainsing
 	
-	purpose:	存储一些应用程序的全局对象，实现应用程序的Init, Update,
-				Render, Destory函数由WinMain调用
+	purpose:	Top level appication class. Initialization and clean-up
+                of the whole app are done in this class. It creates the
+                scene, updates it with user input, and then tells the
+                underlying renderer to render it. This class also serves
+                as a hub for singleton 'manager' classes.
 *********************************************************************/
 #ifndef Application_h__
 #define Application_h__

@@ -220,6 +220,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		InputCapturer::SetLeftBtnDown(false);
 		InputCapturer::SetMousePosition(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 		break;
+    case WM_RBUTTONDOWN:
+        InputCapturer::SetRightBtnDown(true);
+        InputCapturer::SetMousePosition(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+        break;
+    case WM_RBUTTONUP:
+        InputCapturer::SetRightBtnDown(false);
+        InputCapturer::SetMousePosition(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+        break;
 	case WM_MOUSEMOVE:
 		InputCapturer::SetMousePosition(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 		break;

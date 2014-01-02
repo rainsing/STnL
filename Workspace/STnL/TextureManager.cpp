@@ -31,7 +31,7 @@ TextureManager::~TextureManager()
 	}
 }
 
-Texture* TextureManager::LoadFromFile(const char* fileName)
+int TextureManager::LoadFromFile(const char* fileName)
 {
 	ILuint imageId = 0;
 	ilGenImages(1, &imageId);
@@ -53,5 +53,5 @@ Texture* TextureManager::LoadFromFile(const char* fileName)
 	ilBindImage(0);
 	ilDeleteImage(imageId);
 	
-	return texture;
+	return m_textureList.size() - 1;
 }

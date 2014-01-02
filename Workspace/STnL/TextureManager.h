@@ -22,7 +22,7 @@ public:
 	TextureManager(void);
 	~TextureManager();
 
-	Texture* LoadFromFile(const char* fileName);
+	int LoadFromFile(const char* fileName);
 	inline Texture* GetTexture(int index);
 
 private:

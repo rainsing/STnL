@@ -13,6 +13,7 @@
 #include "InputCapturer.h"
 
 bool InputCapturer::m_mouseLeftBtnDown = false;
+bool InputCapturer::m_mouseRightBtnDown = false;
 int InputCapturer::m_mouseX = 0;
 int InputCapturer::m_mouseY = 0;
 int InputCapturer::m_mouseDx = 0;
@@ -99,6 +100,11 @@ void InputCapturer::SetLeftBtnDown( bool leftBtnDown )
 	m_mouseLeftBtnDown = leftBtnDown;
 }
 
+void InputCapturer::SetRightBtnDown( bool rightBtnDown )
+{
+    m_mouseRightBtnDown = rightBtnDown;
+}
+
 void InputCapturer::SetMousePosition( int x, int y )
 {
 	m_mouseDx = x - m_mouseX;
@@ -110,6 +116,11 @@ void InputCapturer::SetMousePosition( int x, int y )
 bool InputCapturer::IsLeftBtnDown( void )
 {
 	return m_mouseLeftBtnDown;
+}
+
+bool InputCapturer::IsRightBtnDown( void )
+{
+    return m_mouseRightBtnDown;
 }
 
 void InputCapturer::GetMouseMovement( int& dx, int& dy )

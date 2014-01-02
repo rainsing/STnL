@@ -36,14 +36,17 @@ public:
 	bool IsKeyPressed(KeyCode keyCode);
 
 	static void SetLeftBtnDown(bool leftBtnDown);
+    static void SetRightBtnDown(bool rightBtnDown);
 	static void SetMousePosition(int x, int y);
 
 	bool IsLeftBtnDown(void);
+    bool IsRightBtnDown(void);
 	void GetMouseMovement(int& dx, int& dy);
 	void ClearMouseMovement(void);
 
 private:
 	static bool m_mouseLeftBtnDown;
+    static bool m_mouseRightBtnDown;
 	static int m_mouseX;
 	static int m_mouseY;
 	static int m_mouseDx;
