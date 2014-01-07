@@ -41,7 +41,7 @@ public:
 	Texture* baseTexture;
 	Texture* normalTexture;
 
-	Vector3 diffuseColor;
+	Vector3 lightColor;
 	Vector3 ambientColor;
 };
 
@@ -53,7 +53,7 @@ public:
 public:
 	Texture* baseTexture;
 
-	Vector3 diffuseColor;
+	Vector3 lightColor;
 	Vector3 ambientColor;
 };
 

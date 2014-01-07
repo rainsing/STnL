@@ -46,7 +46,7 @@ public:
 	Matrix4 inverseWorldMatrix;
 	Matrix4 worldViewProjMatrix;
 	Vector3 lightPosition;
-	Vector3 diffuseColor;
+	Vector3 lightColor;
 	Vector3 ambientColor;
 };
 
@@ -63,7 +63,7 @@ public:
 	Vector3 ambientColor;
 };
 
-class VsTangentSpaceLighting : public VertexShader
+class VsNormalMap : public VertexShader
 {
 public:
 	virtual VertexShaderOutput Main(const Vertex& vertex);

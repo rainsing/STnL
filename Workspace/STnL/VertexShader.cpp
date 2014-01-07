@@ -82,7 +82,7 @@ VertexShaderOutput VsFixedFunction::Main( const Vertex& vertex )
 	float angle = vertex.normal.Dot(objSpaceLightDir);
 	Saturate(angle);
 
-	output.attribute0 = diffuseColor * angle + ambientColor;
+	output.attribute0 = lightColor * angle + ambientColor * 2.0f;
 
 	return output;
 }
@@ -116,7 +116,7 @@ VertexShaderOutput VsFixedFunctionAltUv::Main( const Vertex& vertex )
 	return output;
 }
 
-VertexShaderOutput VsTangentSpaceLighting::Main( const Vertex& vertex )
+VertexShaderOutput VsNormalMap::Main( const Vertex& vertex )
 {
 	VertexShaderOutput output;
 

@@ -96,7 +96,7 @@ void Application::Initialize( HWND hWnd, int windowWidth, int windowHeight )
 	mat = m_materialManager->CreateMaterial();
 	mat->baseTextureId = baseTextureId;
 	mat->bumpTextureId = bumpTextureId;
-	mat->vertexShaderId = VS_TANGENT_SPACE_LIGHTING;
+	mat->vertexShaderId = VS_NORMAL_MAP;
 	mat->pixelShaderId = PS_NORMAL_MAP;
 	mat->wireFrame = false;
 
@@ -109,7 +109,7 @@ void Application::Initialize( HWND hWnd, int windowWidth, int windowHeight )
 	mat = m_materialManager->CreateMaterial();
 	mat->baseTextureId = baseTextureId2;
 	mat->bumpTextureId = -1;
-	mat->vertexShaderId = VS_TANGENT_SPACE_LIGHTING;
+	mat->vertexShaderId = VS_FIXED_FUNCTION;
 	mat->pixelShaderId = PS_TOON_LIGHTING;
 	mat->wireFrame = false;
 
@@ -175,33 +175,18 @@ void Application::Update( void )
 		return;
 	}
 
-	// 计算delta T
+	// calculate frame time
 	LARGE_INTEGER counter;
 	QueryPerformanceCounter(&counter);
 	float dt = static_cast<float>((counter.QuadPart - m_nTicks) / double(m_nTicksPerSecond));
 	m_nTicks = counter.QuadPart;
 
-	// 显示FPS
+	// FPS display
 	char str[256];
 	sprintf_s(str, 256, "FPS: %.1f", 1.0f / dt);
 	m_textOutput->Print(str, 5, 5);
 
-	// 切换shading mode
-	if (m_inputCapturer->IsKeyPressed(KC_T))
-	{
-		int shadeMode = m_renderer->GetShadeMode();
-
-		if (shadeMode == Renderer::SHADING_MODE_MAX - 1)
-		{
-			shadeMode = Renderer::SHADING_MODE_START;
-
-		}
-
-		shadeMode++;
-		m_renderer->SetShadeMode(static_cast<Renderer::ShadeMode>(shadeMode));
-	}
-
-	// 切换当前物体
+	// next object
 	if (m_inputCapturer->IsKeyPressed(KC_C))
 	{
 		m_sceneObjectList[m_activeObjectIndex]->Hide(true);
@@ -219,8 +204,15 @@ void Application::Update( void )
 	}
 
 	SceneObject* object = m_sceneObjectList[m_activeObjectIndex];
+
+    // toggle wireframe mode
+    if (m_inputCapturer->IsKeyPressed(KC_T))
+    {
+        bool& wireFrame = object->GetMaterial()->wireFrame;
+        wireFrame = !wireFrame;
+    }
 	
-	// 控制物体旋转
+	// object rotation
 	// --begin--
 
 	float rotationX = 0.0f;
@@ -250,10 +242,10 @@ void Application::Update( void )
 		object->LocalRotate(rotationX, rotationY, 0.0f);
 	}
 
-	// 控制物体旋转
+	// object rotation
 	// --end--
 
-	// 控制摄像机移动
+	// camera movement
 	// --begin--
 
 	float offsetX = 0.0f;
@@ -293,10 +285,10 @@ void Application::Update( void )
 		m_activeCamera->LocalMove(offsetX, offsetY, offsetZ);
 	}
 
-	// 控制摄像机移动
+	// camera movement
 	// --end--
 
-	// 控制摄像机旋转
+	// camera rotation
 	// --begin--
 
 	if (m_inputCapturer->IsLeftBtnDown())
@@ -310,9 +302,10 @@ void Application::Update( void )
 		}
 	}
 
-	// 控制摄像机旋转
+	// camera rotation
 	// --end--
 
+    // light source movement
     if (m_inputCapturer->IsRightBtnDown())
     {
         int dx, dy;
@@ -325,7 +318,7 @@ void Application::Update( void )
         }
     }
 
-	// 重置场景
+	// reset scene
 	if (m_inputCapturer->IsKeyPressed(KC_R))
 	{
 		object->ResetRotation();
@@ -359,13 +352,8 @@ void Application::Render( void )
 		renderUnit->m_ib = object->GetMesh()->GetIndexBuffer();
 		renderUnit->m_wireFrame = material->wireFrame;
 
-		int vertexShaderId = m_renderer->GetShadeMode() == Renderer::SHADING_MODE_PHONG 
-			? material->vertexShaderId 
-			: (material->vertexShaderId == VS_TANGENT_SPACE_LIGHTING_SC2_UV ? VS_FIXED_FUNCTION_ALT_UV : VS_FIXED_FUNCTION);
-
-		int pixelShaderId = m_renderer->GetShadeMode() == Renderer::SHADING_MODE_PHONG 
-			? material->pixelShaderId 
-			: PS_FIXED_FUNCTION;
+		int vertexShaderId = material->vertexShaderId;
+		int pixelShaderId = material->pixelShaderId;
 
 		switch (vertexShaderId)
 		{
@@ -374,60 +362,27 @@ void Application::Render( void )
 				VsFixedFunction* myVS = new VsFixedFunction();
 				renderUnit->m_vs = myVS;
 
+                // fill in the shader constants
 				Matrix4 worldMatrix;
 				object->GetWorldMatrix(worldMatrix);
-				MatrixTranspose(myVS->inverseWorldMatrix, worldMatrix);	// This only works when there is no translation 
-																		// or scaling!!!
+				MatrixTranspose(myVS->inverseWorldMatrix, worldMatrix);	// This only works when there is no translation or scaling!!!
 				MatrixMultiply(myVS->worldViewProjMatrix, worldMatrix, m_activeCamera->GetViewMatrix());
 				MatrixMultiply(myVS->worldViewProjMatrix, myVS->worldViewProjMatrix, m_activeCamera->GetProjMatrix());
 
 				myVS->lightPosition = m_activeLight->position;
-
 				myVS->ambientColor = m_activeLight->ambientColor;
-				myVS->diffuseColor = m_activeLight->diffuseColor;
+				myVS->lightColor = m_activeLight->diffuseColor;
 			}
 			break;
-		case VS_FIXED_FUNCTION_ALT_UV:
+
+		case VS_NORMAL_MAP:
 			{
-				VsFixedFunctionAltUv* myVS = new VsFixedFunctionAltUv();
+				VsNormalMap* myVS = new VsNormalMap();
 				renderUnit->m_vs = myVS;
 
-				Matrix4 worldMatrix;
-				object->GetWorldMatrix(worldMatrix);
-				MatrixTranspose(myVS->inverseWorldMatrix, worldMatrix);	// This only works when there is no translation 
-				// or scaling!!!
-				MatrixMultiply(myVS->worldViewProjMatrix, worldMatrix, m_activeCamera->GetViewMatrix());
-				MatrixMultiply(myVS->worldViewProjMatrix, myVS->worldViewProjMatrix, m_activeCamera->GetProjMatrix());
-
-				myVS->lightPosition = m_activeLight->position;
-
-				myVS->ambientColor = m_activeLight->ambientColor;
-				myVS->diffuseColor = m_activeLight->diffuseColor;
-			}
-			break;
-		case VS_TANGENT_SPACE_LIGHTING:
-			{
-				VsTangentSpaceLighting* myVS = new VsTangentSpaceLighting();
-				renderUnit->m_vs = myVS;
-
+                // fill in the shader constants
 				object->GetWorldMatrix(myVS->worldMatrix);
-				MatrixTranspose(myVS->inverseWorldMatrix, myVS->worldMatrix);	// This only works when there is no translation 
-																				// or scaling!!!
-				MatrixMultiply(myVS->worldViewProjMatrix, myVS->worldMatrix, m_activeCamera->GetViewMatrix());
-				MatrixMultiply(myVS->worldViewProjMatrix, myVS->worldViewProjMatrix, m_activeCamera->GetProjMatrix());
-
-				myVS->lightPosition = m_activeLight->position;
-			}
-			break;
-
-		case VS_TANGENT_SPACE_LIGHTING_SC2_UV:
-			{
-				VsTangentSpaceLightingSc2Uv* myVS = new VsTangentSpaceLightingSc2Uv();
-				renderUnit->m_vs = myVS;
-
-				object->GetWorldMatrix(myVS->worldMatrix);
-				MatrixTranspose(myVS->inverseWorldMatrix, myVS->worldMatrix);	// This only works when there is no translation 
-																				// or scaling!!!
+				MatrixTranspose(myVS->inverseWorldMatrix, myVS->worldMatrix);	// This only works when there is no translation or scaling!!!
 				MatrixMultiply(myVS->worldViewProjMatrix, myVS->worldMatrix, m_activeCamera->GetViewMatrix());
 				MatrixMultiply(myVS->worldViewProjMatrix, myVS->worldViewProjMatrix, m_activeCamera->GetProjMatrix());
 
@@ -441,15 +396,6 @@ void Application::Render( void )
 
 		switch (pixelShaderId)
 		{
-		case PS_FIXED_FUNCTION:
-			{
-				PsFixedFunction* myPS = new PsFixedFunction();
-				renderUnit->m_ps = myPS;
-
-				myPS->baseTexture = m_textureManager->GetTexture(material->baseTextureId);
-			}
-			break;
-
 		case PS_NORMAL_MAP:
 			{
 				PsNormalMap* myPS = new PsNormalMap();
@@ -457,7 +403,7 @@ void Application::Render( void )
 
 				myPS->baseTexture = m_textureManager->GetTexture(material->baseTextureId);
 				myPS->normalTexture = m_textureManager->GetTexture(material->bumpTextureId);
-				myPS->diffuseColor = m_activeLight->diffuseColor;
+				myPS->lightColor = m_activeLight->diffuseColor;
 				myPS->ambientColor = m_activeLight->ambientColor;
 			}
 			break;
@@ -468,7 +414,7 @@ void Application::Render( void )
 				renderUnit->m_ps = myPS;
 
 				myPS->baseTexture = m_textureManager->GetTexture(material->baseTextureId);
-				myPS->diffuseColor = m_activeLight->diffuseColor;
+				myPS->lightColor = m_activeLight->diffuseColor;
 				myPS->ambientColor = m_activeLight->ambientColor;
 			}
 			break;

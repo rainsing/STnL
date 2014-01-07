@@ -29,22 +29,11 @@ public:
 		CULL_MODE_NONE
 	};
 
-	enum ShadeMode
-	{
-		SHADING_MODE_START = 0,
-		SHADING_MODE_FLAT,
-		SHADING_MODE_GOURAUD,
-		SHADING_MODE_PHONG,
-		SHADING_MODE_MAX
-	};
-
 public:
 	Renderer(void);
 
 	void SetRenderTarget(BackBuffer* renderTarget, DepthBuffer* depthBuffer);
 	void AddRenderUnit(RenderUnit* renderUnit);
-	void SetShadeMode(ShadeMode shadeMode);
-	ShadeMode GetShadeMode(void);
 	void Render(void);
 
 private:
@@ -76,7 +65,6 @@ private:
 	RenderUnitList m_renderUnitList;
 
 	CullMode m_cullMode;
-	ShadeMode m_shadeMode;
 };
 
 #endif // Renderer_h__
