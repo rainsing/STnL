@@ -7,7 +7,7 @@
 	file ext:	cpp
 	author:		Rainsing
 	
-	purpose:	≤∂ªÒ Û±Íº¸≈Ã ‰»Î
+	purpose:	Captures mouse/keyboard input
 *********************************************************************/
 #include "stdafx.h"
 #include "InputCapturer.h"
@@ -18,6 +18,7 @@ int InputCapturer::m_mouseX = 0;
 int InputCapturer::m_mouseY = 0;
 int InputCapturer::m_mouseDx = 0;
 int InputCapturer::m_mouseDy = 0;
+int InputCapturer::m_mouseWheelRotation = 0;
 
 bool InputCapturer::IsKeyDown( KeyCode keyCode )
 {
@@ -84,8 +85,8 @@ bool InputCapturer::IsKeyPressed( KeyCode keyCode )
 		virtKey = 'C';
 		break;
 
-	case KC_T:
-		virtKey = 'T';
+	case KC_W:
+		virtKey = 'W';
 		break;
 
 	default:
@@ -113,6 +114,11 @@ void InputCapturer::SetMousePosition( int x, int y )
 	m_mouseY = y;
 }
 
+void InputCapturer::SetMouseWheelRotation( int rotation )
+{
+    m_mouseWheelRotation = rotation;
+}
+
 bool InputCapturer::IsLeftBtnDown( void )
 {
 	return m_mouseLeftBtnDown;
@@ -123,13 +129,15 @@ bool InputCapturer::IsRightBtnDown( void )
     return m_mouseRightBtnDown;
 }
 
-void InputCapturer::GetMouseMovement( int& dx, int& dy )
+void InputCapturer::GetMouseMovement( int& dx, int& dy, int& wheelRotation )
 {
 	dx = m_mouseDx;
 	dy = m_mouseDy;
+    wheelRotation = m_mouseWheelRotation;
 }
 
 void InputCapturer::ClearMouseMovement( void )
 {
 	m_mouseDx = m_mouseDy = 0;
+    m_mouseWheelRotation = 0;
 }

@@ -231,6 +231,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_MOUSEMOVE:
 		InputCapturer::SetMousePosition(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 		break;
+    case WM_MOUSEWHEEL:
+        InputCapturer::SetMouseWheelRotation(GET_WHEEL_DELTA_WPARAM(wParam));
+        break;
 
 	default:
 		return DefWindowProc(hWnd, message, wParam, lParam);

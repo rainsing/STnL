@@ -186,7 +186,7 @@ void Application::Update( void )
 	sprintf_s(str, 256, "FPS: %.1f", 1.0f / dt);
 	m_textOutput->Print(str, 5, 5);
 
-	// next object
+	// cycle through objects
 	if (m_inputCapturer->IsKeyPressed(KC_C))
 	{
 		m_sceneObjectList[m_activeObjectIndex]->Hide(true);
@@ -206,111 +206,32 @@ void Application::Update( void )
 	SceneObject* object = m_sceneObjectList[m_activeObjectIndex];
 
     // toggle wireframe mode
-    if (m_inputCapturer->IsKeyPressed(KC_T))
+    if (m_inputCapturer->IsKeyPressed(KC_W))
     {
         bool& wireFrame = object->GetMaterial()->wireFrame;
         wireFrame = !wireFrame;
     }
-	
-	// object rotation
-	// --begin--
-
-	float rotationX = 0.0f;
-	float rotationY = 0.0f;
-	float rotationAmount = 90.0f * dt;
-
-	if (m_inputCapturer->IsKeyDown(KC_UP_ARROW) && !m_inputCapturer->IsKeyDown(KC_DOWN_ARROW))
-	{
-		rotationX = rotationAmount;
-	}
-	else if (!m_inputCapturer->IsKeyDown(KC_UP_ARROW) && m_inputCapturer->IsKeyDown(KC_DOWN_ARROW))
-	{
-		rotationX = -rotationAmount;
-	}
-
-	if (m_inputCapturer->IsKeyDown(KC_LEFT_ARROW) && !m_inputCapturer->IsKeyDown(KC_RIGHT_ARROW))
-	{
-		rotationY = rotationAmount;
-	}
-	else if (!m_inputCapturer->IsKeyDown(KC_LEFT_ARROW) && m_inputCapturer->IsKeyDown(KC_RIGHT_ARROW))
-	{
-		rotationY = -rotationAmount;
-	}
-
-	if (rotationX != 0.0f || rotationY != 0.0f)
-	{
-		object->LocalRotate(rotationX, rotationY, 0.0f);
-	}
-
-	// object rotation
-	// --end--
 
 	// camera movement
-	// --begin--
+    int dx, dy, wheelRotation;
+    m_inputCapturer->GetMouseMovement(dx, dy, wheelRotation);
 
-	float offsetX = 0.0f;
-	float offsetY = 0.0f;
-	float offsetZ = 0.0f;
-	float offsetAmount = 10.0f * dt;
+    if (m_inputCapturer->IsLeftBtnDown())
+    {
+        if (dx != 0 || dy != 0)
+        {
+            m_activeCamera->Orbit(dy * 0.5f, dx * 0.5f);
+        }
+    }
 
-	if (m_inputCapturer->IsKeyDown(KC_A) && !m_inputCapturer->IsKeyDown(KC_D))
-	{
-		offsetX = -offsetAmount;
-	}
-	else if (!m_inputCapturer->IsKeyDown(KC_A) && m_inputCapturer->IsKeyDown(KC_D))
-	{
-		offsetX = offsetAmount;
-	}
-
-	if (m_inputCapturer->IsKeyDown(KC_Q) && !m_inputCapturer->IsKeyDown(KC_E))
-	{
-		offsetY = -offsetAmount;
-	}
-	else if (!m_inputCapturer->IsKeyDown(KC_Q) && m_inputCapturer->IsKeyDown(KC_E))
-	{
-		offsetY = offsetAmount;
-	}
-
-	if (m_inputCapturer->IsKeyDown(KC_W) && !m_inputCapturer->IsKeyDown(KC_S))
-	{
-		offsetZ = offsetAmount;
-	}
-	else if (!m_inputCapturer->IsKeyDown(KC_W) && m_inputCapturer->IsKeyDown(KC_S))
-	{
-		offsetZ = -offsetAmount;
-	}
-
-	if (offsetX != 0.0f || offsetY != 0.0f || offsetZ != 0.0f)
-	{
-		m_activeCamera->LocalMove(offsetX, offsetY, offsetZ);
-	}
-
-	// camera movement
-	// --end--
-
-	// camera rotation
-	// --begin--
-
-	if (m_inputCapturer->IsLeftBtnDown())
-	{
-		int dx, dy;
-		m_inputCapturer->GetMouseMovement(dx, dy);
-
-		if (dx != 0 || dy != 0)
-		{
-			m_activeCamera->LocalRotate(dy * 0.5f, dx * 0.5f);
-		}
-	}
-
-	// camera rotation
-	// --end--
+    if (wheelRotation != 0)
+    {
+        m_activeCamera->LocalMove(0, 0, wheelRotation * 0.01f);
+    }
 
     // light source movement
     if (m_inputCapturer->IsRightBtnDown())
     {
-        int dx, dy;
-        m_inputCapturer->GetMouseMovement(dx, dy);
-
         if (dx != 0 || dy != 0)
         {
             m_activeLight->position.x += dx * 0.5f;

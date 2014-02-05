@@ -84,20 +84,19 @@ void Camera::LocalMove( float x, float y, float z )
 	Matrix4 inverseRotationMatrix;
 	MatrixTranspose(inverseRotationMatrix, rotationMatrix);
 
+    // we need to transform the movement vector back to world space
 	Vector4 worldSpaceOffset = inverseRotationMatrix.Transform(Vector4(x, y, z, 1.0f));
 
 	m_position.x += worldSpaceOffset.x;
 	m_position.y += worldSpaceOffset.y;
 	m_position.z += worldSpaceOffset.z;
 
-	m_lookAt.x += worldSpaceOffset.x;
-	m_lookAt.y += worldSpaceOffset.y;
-	m_lookAt.z += worldSpaceOffset.z;
+    m_distanceToLookAt = (m_lookAt - m_position).Length();
 
 	m_viewMatrixDirty = true;
 }
 
-void Camera::LocalRotate( float x, float y )
+void Camera::Orbit( float x, float y )
 {
 	Matrix4 viewSpaceRotation;
 	MakeRotationMatrixX(viewSpaceRotation, x);
@@ -142,6 +141,8 @@ void Camera::Reset( void )
 	Vector3 right = m_up.Cross(viewDir);
 	m_up = viewDir.Cross(right);
 	m_up.Normalize();
+
+    m_distanceToLookAt = (m_lookAt - m_position).Length();
 
 	m_viewMatrixDirty = true;
 }

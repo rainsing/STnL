@@ -24,7 +24,7 @@ public:
 	const Matrix4& GetProjMatrix(void);
 
 	void LocalMove(float x, float y, float z);
-	void LocalRotate(float x, float y);
+	void Orbit(float x, float y);
 	void Reset(void);
 
 private:

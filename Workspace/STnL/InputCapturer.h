@@ -7,7 +7,7 @@
 	file ext:	h
 	author:		Rainsing
 	
-	purpose:	≤∂ªÒ Û±Íº¸≈Ã ‰»Î
+	purpose:	Captures mouse/keyboard input
 *********************************************************************/
 #ifndef InputCapturer_h__
 #define InputCapturer_h__
@@ -38,11 +38,12 @@ public:
 	static void SetLeftBtnDown(bool leftBtnDown);
     static void SetRightBtnDown(bool rightBtnDown);
 	static void SetMousePosition(int x, int y);
+    static void SetMouseWheelRotation(int rotation);
 
 	bool IsLeftBtnDown(void);
     bool IsRightBtnDown(void);
-	void GetMouseMovement(int& dx, int& dy);
-	void ClearMouseMovement(void);
+	void GetMouseMovement(int& dx, int& dy, int& wheelRotation);
+	void ClearMouseMovement(void);      // this has to be called once every frame
 
 private:
 	static bool m_mouseLeftBtnDown;
@@ -51,6 +52,7 @@ private:
 	static int m_mouseY;
 	static int m_mouseDx;
 	static int m_mouseDy;
+    static int m_mouseWheelRotation;
 };
 
 #endif // InputCapturer_h__
