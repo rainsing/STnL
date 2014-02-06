@@ -7,7 +7,7 @@
 	file ext:	cpp
 	author:		Rainsing
 	
-	purpose:	Ò»Ð©helperº¯Êý
+	purpose:	a few helper functions and macros
 *********************************************************************/
 #include "stdafx.h"
 #include "Utilities.h"

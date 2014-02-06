@@ -12,8 +12,6 @@
 #ifndef Vector_h__
 #define Vector_h__
 
-class Vector4;
-
 class Vector2
 {
 public:
@@ -161,6 +159,7 @@ Vector4 Vector4::operator-( const Vector4& rhs ) const
 Vector4 Lerp(Vector4& v0, Vector4& v1, float t);
 void Lerp(Vector4& out, Vector4& v0, Vector4& v1, float t);
 
+// vector clamp and saturate, same as corresponding HLSL intrinsic functions
 Vector4& Clamp(Vector4& value, float minValue, float maxValue);
 Vector4& Saturate(Vector4& value);
 

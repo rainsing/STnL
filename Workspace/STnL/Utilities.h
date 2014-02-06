@@ -7,7 +7,7 @@
 	file ext:	h
 	author:		Rainsing
 	
-	purpose:	一些helper函数
+	purpose:	a few helper functions and macros
 *********************************************************************/
 #ifndef Utilities_h__
 #define Utilities_h__
@@ -17,7 +17,7 @@
 #define GET_X_LPARAM(lp)                        ((int)(short)LOWORD(lp))
 #define GET_Y_LPARAM(lp)                        ((int)(short)HIWORD(lp))
 
-// 交换两个整数的值
+// swap the values of the two integers
 inline void swap(int& a, int& b)
 {
 	int temp = a;
@@ -25,7 +25,7 @@ inline void swap(int& a, int& b)
 	b = temp;
 }
 
-// 角度转弧度
+// degrees to radians
 #define TO_RADIAN(a) (a * PI / 180.0f)
 
 // Safe delete
@@ -43,35 +43,35 @@ inline void swap(int& a, int& b)
 		x = NULL; \
 	}
 
-// 快速浮点转整数
-// 经过VTune的profiling，我发现Intel的机器上浮点转整形的操作慢的不像话，
-// 而Pixel Shader算完的浮点颜色值是必须要转成整形才能写到frame buffer里的……
-// 每像素四次的这种转换（对应四个颜色通道）足以拖慢整个程序。
-// 于是乎在http://stereopsis.com/FPU.html 找到了一个很神奇的算法来fix这个问题。
+// Fast floating point to fixed point conversion.
+// After the pixel shader outputs the final pixel color in floating point format,
+// the floats have to be converted to integers before they can be written to the frame buffer.
+// This was proven (by the profiler) to be pretty slow and has resulted in very low FPS.
+// So I googled and found a solution at http://stereopsis.com/FPU.html to fix this.
+// However, after I upgraded the project to VS2012, the compiler by default generates faster 
+// SSE instructions to do the conversion, and no longer emits the long latency FLDCW instruction.
+// The fast conversion trick thus became a futility.
 
-const double _double2fixmagic = 68719476736.0*1.5;		//2^36 * 1.5,  (52-_shiftamt=36) uses limited precisicion to floor
-const int _shiftamt        = 16;						//16.16 fixed point representation,
-
-inline int Double2Int(double val)
-{
-	val		= val + _double2fixmagic;
-	return ((int*)&val)[0] >> _shiftamt; 
-}
+//const double _double2fixmagic = 68719476736.0*1.5;		//2^36 * 1.5,  (52-_shiftamt=36) uses limited precisicion to floor
+//const int _shiftamt        = 16;						//16.16 fixed point representation,
+//
+//inline int Double2Int(double val)
+//{
+//	val		= val + _double2fixmagic;
+//	return ((int*)&val)[0] >> _shiftamt; 
+//}
+//
+//inline int Float2Int(float val)
+//{
+//	return Double2Int ((double)val);
+//}
 
 inline int Float2Int(float val)
 {
-	return Double2Int ((double)val);
+    return static_cast<int>(val);
 }
 
-// SSE线性插值
-//inline void Lerp_SSE(__m128& out, __m128& v0, __m128& v1, __m128& t)
-//{
-//	out = _mm_sub_ps(v0, v1);
-//	out = _mm_mul_ps(out, t);
-//	out = _mm_add_ps(out, v1);
-//}
-
-// clamp
+// scalar clamp and saturate, same as corresponding HLSL intrinsic functions
 inline float& Clamp(float& value, float minValue, float maxValue)
 {
 	if (value < minValue)
