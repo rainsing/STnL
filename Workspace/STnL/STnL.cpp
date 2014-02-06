@@ -52,16 +52,12 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 	hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_STNL));
 
 	{
-		// 应用程序初始化
 		Application application;
 		application.Initialize(hWnd, nWindowWidth, nWindowHeight);
 
-		// ---------------------------------
-
-		// 主循环
+		// The main loop
 		while (true)
 		{
-			// 处理Windows消息
 			if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 			{
 				if (msg.message == WM_QUIT)
@@ -76,14 +72,10 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 				}
 			}
 
-			// 应用程序更新和渲染
 			application.Update();
 			application.Render();
 		}
 
-		// ---------------------------------
-
-		// 应用程序销毁
 		application.Destroy();
 	}
 
@@ -144,13 +136,13 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
    hInst = hInstance; // Store instance handle in our global variable
 
-   // 创建一个客户区尺寸为g_windowWidth * g_windowHeight，不能resize，不能最大化的窗口
    RECT rect;
    rect.top = 0;
    rect.left = 0;
    rect.right = nWindowWidth;
    rect.bottom = nWindowHeight;
 
+   // Resizing and maximizing are not allowed. 
    DWORD style = WS_OVERLAPPEDWINDOW & ~(WS_THICKFRAME | WS_MAXIMIZEBOX);
 
    AdjustWindowRect(&rect, style, TRUE);
@@ -212,6 +204,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		PostQuitMessage(0);
 		break;
 
+    // Handle mouse messages and inform InputCapturer of the states of the mouse.
 	case WM_LBUTTONDOWN:
 		InputCapturer::SetLeftBtnDown(true);
 		InputCapturer::SetMousePosition(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));

@@ -2,7 +2,8 @@
 // Created:		2012/09/24
 // Filename: 	TextOutput.cpp
 // Author:		Rainsing
-// Purpose:		在屏幕上输出文本
+// Purpose:		Utility class for printing text onto the client area of
+//              the main window.
 // ********************************************************************
 #include "stdafx.h"
 #include "TextOutput.h"

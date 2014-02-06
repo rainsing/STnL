@@ -7,7 +7,7 @@
 	file ext:	cpp
 	author:		Rainsing
 	
-	purpose:	3D模型网格数据
+	purpose:	A mesh contains the raw vertex data of a geometry.
 *********************************************************************/
 #include "stdafx.h"
 #include "Mesh.h"

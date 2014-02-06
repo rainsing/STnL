@@ -7,7 +7,8 @@
 	file ext:	cpp
 	author:		Rainisng
 	
-	purpose:	负责3D mesh的加载和管理
+    purpose:	The mesh manager is responsible for loading meshes from file
+                and maintaining a list of all loaded meshes.
 *********************************************************************/
 #include "stdafx.h"
 #include "MeshManager.h"

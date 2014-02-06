@@ -109,7 +109,7 @@ void Application::Initialize( HWND hWnd, int windowWidth, int windowHeight )
 	mat = m_materialManager->CreateMaterial();
 	mat->baseTextureId = baseTextureId2;
 	mat->bumpTextureId = -1;
-	mat->vertexShaderId = VS_FIXED_FUNCTION;
+	mat->vertexShaderId = VS_VERTEX_LIGHTING;
 	mat->pixelShaderId = PS_TOON_LIGHTING;
 	mat->wireFrame = false;
 
@@ -242,7 +242,6 @@ void Application::Update( void )
 	// reset scene
 	if (m_inputCapturer->IsKeyPressed(KC_R))
 	{
-		object->ResetRotation();
 		m_activeCamera->Reset();
         m_activeLight->position = Vector3(30.0f, 15.0f, -15.0f);
 	}
@@ -278,7 +277,7 @@ void Application::Render( void )
 
 		switch (vertexShaderId)
 		{
-		case VS_FIXED_FUNCTION:
+		case VS_VERTEX_LIGHTING:
 			{
 				VsFixedFunction* myVS = new VsFixedFunction();
 				renderUnit->m_vs = myVS;

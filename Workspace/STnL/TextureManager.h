@@ -7,7 +7,7 @@
 	file ext:	h
 	author:		Rainsing
 	
-	purpose:	加载并管理纹理
+	purpose:	Load textures form file and maintain a list of loaded texutres.
 *********************************************************************/
 #ifndef TextureManager_h__
 #define TextureManager_h__
@@ -22,7 +22,11 @@ public:
 	TextureManager(void);
 	~TextureManager();
 
+    // load an image file into a texture object,
+    // and return an integer ID of the texture.
 	int LoadFromFile(const char* fileName);
+
+    // Retrieve a texture object by its ID.
 	inline Texture* GetTexture(int index);
 
 private:

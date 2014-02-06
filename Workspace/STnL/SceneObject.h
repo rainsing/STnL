@@ -7,7 +7,7 @@
 	file ext:	h
 	author:		Rainsing
 	
-	purpose:	表示3D场景中的一个物体
+	purpose:	A visible object in the scene.
 *********************************************************************/
 #ifndef SceneObject_h__
 #define SceneObject_h__
@@ -22,8 +22,6 @@ class SceneObject
 public:
 	SceneObject(Mesh* mesh, Material* material);
 
-	void LocalRotate(float x, float y, float z);
-	void ResetRotation(void);
 	void GetWorldMatrix(Matrix4& out);
 
 	inline Mesh* GetMesh(void);
@@ -34,10 +32,7 @@ public:
 private:
 	Mesh* m_mesh;
 	Material* m_material;
-
 	Matrix4 m_worldMatrix;
-	Matrix4 m_rotationMatrix;
-
 	bool m_hide;
 };
 

@@ -2,7 +2,8 @@
 // Created:		2012/09/24
 // Filename: 	TextOutput.h
 // Author:		Rainsing
-// Purpose:		在屏幕上输出文本
+// Purpose:		Utility class for printing text onto the client area of
+//              the main window.
 // ********************************************************************
 #ifndef TextOutput_h__
 #define TextOutput_h__

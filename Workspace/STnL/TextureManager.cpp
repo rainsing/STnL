@@ -7,7 +7,7 @@
 	file ext:	cpp
 	author:		Rainsing
 	
-	purpose:	加载并管理纹理
+	purpose:	Load textures form file and maintain a list of loaded texutres.
 *********************************************************************/
 #include "stdafx.h"
 #include "TextureManager.h"
@@ -19,7 +19,7 @@
 
 TextureManager::TextureManager( void )
 {
-	// 初始化DevIL
+	// We use DevIL to load and decode various types of image file.
 	ilInit();
 }
 
@@ -36,8 +36,6 @@ int TextureManager::LoadFromFile(const char* fileName)
 	ILuint imageId = 0;
 	ilGenImages(1, &imageId);
 	ilBindImage(imageId);
-
-	// DevIL这货几乎通吃所有的图片格式，太特么强大了！
 	ilLoadImage(fileName);
 
 	ILint width = ilGetInteger(IL_IMAGE_WIDTH);
@@ -46,6 +44,8 @@ int TextureManager::LoadFromFile(const char* fileName)
 	Texture* texture = new Texture();
 	texture->Initialize(width, height);
 
+    // Convert the pixel format of the loaded image to 32-bit RGBA, 
+    // and copy the color data to our texutre object.
 	ilCopyPixels(0, 0, 0, width, height, 1, IL_RGBA, IL_UNSIGNED_BYTE, texture->m_colorData);
 
 	m_textureList.push_back(texture);

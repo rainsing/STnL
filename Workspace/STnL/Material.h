@@ -14,8 +14,8 @@
 
 enum VertexShaderId
 {
-	VS_FIXED_FUNCTION,
-	VS_NORMAL_MAP
+    VS_NORMAL_MAP,
+	VS_VERTEX_LIGHTING
 };
 
 enum PixelShaderId
