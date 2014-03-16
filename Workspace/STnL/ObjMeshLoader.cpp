@@ -186,7 +186,9 @@ void LoadObjMesh(std::string filename, Mesh* mesh)
 		v2.normal.y = normals[faces[i].nor_index[2] - 1].y;
 		v2.normal.z = normals[faces[i].nor_index[2] - 1].z;
 
-		// 计算切线和副法线
+		// Calculate tangents and binormals.
+		// Lengyel, Eric. "Computing Tangent Space Basis Vectors for an Arbitrary Mesh". 
+		// Terathon Software 3D Graphics Library, 2001. http://www.terathon.com/code/tangent.html
 		float x1 = v1.position.x - v0.position.x;
 		float x2 = v2.position.x - v0.position.x;
 		float y1 = v1.position.y - v0.position.y;
@@ -225,14 +227,13 @@ void LoadObjMesh(std::string filename, Mesh* mesh)
 
 	for (unsigned i = 0; i < vertexList.size(); i++)
 	{
-		// 对normal, binormal和tangent做Gram-Schmidt正交化处理
+		// Gram-Schmidt orthogonalize the TNB axes
 		// --begin--
 		Vector3& normal = vertexList[i].normal;
 
 		Vector3& binormal = vertexList[i].binormal;
 		binormal = binormal - normal * binormal.Dot(normal);
 
-		// 整出这种UV来还指望光照能正确么？！
 		if (binormal.Equal(Vector3::ZERO, 0.0001f))
 		{
 			binormal.x = 1.0f;
@@ -240,7 +241,6 @@ void LoadObjMesh(std::string filename, Mesh* mesh)
 
 		binormal.Normalize();
 
-		// TODO: 这里可能会有handedness的问题 想想春春是怎么解决NCIS的normal map问题的
 		Vector3& tangent = vertexList[i].tangent;
 
 		Vector3& d1 = tangent - normal * tangent.Dot(normal);
@@ -248,7 +248,6 @@ void LoadObjMesh(std::string filename, Mesh* mesh)
 		tangent = tangent - d1;
 		tangent = tangent - d2;
 
-		// 整出这种UV来光照肯定正确不了啊！
 		if (tangent.Equal(Vector3::ZERO, 0.0001f))
 		{
 			tangent.y = 1.0f;
@@ -256,7 +255,7 @@ void LoadObjMesh(std::string filename, Mesh* mesh)
 
 		tangent.Normalize();
 
-		// 对normal, binormal和tangent做Gram-Schmidt正交化处理
+		// Gram-Schmidt orthogonalize the TNB axes
 		// --end--
 
 		vb[i]= vertexList[i];
