@@ -202,7 +202,4 @@
       <Filter>Resource</Filter>
     </ResourceCompile>
   </ItemGroup>
-  <ItemGroup>
-    <Text Include="ReadMe.txt" />
-  </ItemGroup>
 </Project>
