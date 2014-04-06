@@ -7,7 +7,7 @@
 	file ext:	h
 	author:		Rainsing
 	
-	purpose:	顶点索引数组
+	purpose:	
 *********************************************************************/
 #ifndef IndexBuffer_h__
 #define IndexBuffer_h__

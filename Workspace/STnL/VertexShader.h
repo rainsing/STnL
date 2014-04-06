@@ -7,7 +7,7 @@
 	file ext:	h
 	author:		Rainsing
 	
-	purpose:	
+	purpose:	Software vertex shader.
 *********************************************************************/
 #ifndef VertexShader_h__
 #define VertexShader_h__
@@ -25,7 +25,7 @@ public:
 public:
 	Vector4 position;
 	Vector2 texCoord;
-	Vector4 attribute0;
+	Vector4 attribute0;		// custom attribute
 };
 
 VertexShaderOutput Lerp(VertexShaderOutput& va0, VertexShaderOutput& va1, float t);
@@ -34,6 +34,10 @@ void Lerp(VertexShaderOutput& out, VertexShaderOutput& va0, VertexShaderOutput& 
 class VertexShader
 {
 public:
+
+	// The entry point of the vertex shader.
+	// Any uniforms / constants can be defined as data member in derived classes.
+	// This function is required to provide a 4-component clip space vertex position in its return value.
 	virtual VertexShaderOutput Main(const Vertex& vertex) = 0;
 };
 
@@ -50,33 +54,7 @@ public:
 	Vector3 ambientColor;
 };
 
-class VsFixedFunctionAltUv : public VertexShader
-{
-public:
-	virtual VertexShaderOutput Main(const Vertex& vertex);
-
-public:
-	Matrix4 inverseWorldMatrix;
-	Matrix4 worldViewProjMatrix;
-	Vector3 lightPosition;
-	Vector3 diffuseColor;
-	Vector3 ambientColor;
-};
-
 class VsNormalMap : public VertexShader
-{
-public:
-	virtual VertexShaderOutput Main(const Vertex& vertex);
-
-public:
-	Matrix4 worldMatrix;
-	Matrix4 inverseWorldMatrix;
-	Matrix4 worldViewProjMatrix;
-
-	Vector3 lightPosition;
-};
-
-class VsTangentSpaceLightingSc2Uv : public VertexShader
 {
 public:
 	virtual VertexShaderOutput Main(const Vertex& vertex);

@@ -7,7 +7,7 @@
 	file ext:	h
 	author:		Rainsing
 	
-	purpose:	¶¥µãÊý×é
+	purpose:	
 *********************************************************************/
 #ifndef VertexBuffer_h__
 #define VertexBuffer_h__

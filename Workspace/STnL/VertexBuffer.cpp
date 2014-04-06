@@ -7,7 +7,7 @@
 	file ext:	cpp
 	author:		Rainsing
 	
-	purpose:	¶¥µãÊý×é
+	purpose:	
 *********************************************************************/
 #include "stdafx.h"
 #include "VertexBuffer.h"

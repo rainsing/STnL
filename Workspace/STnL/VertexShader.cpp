@@ -7,7 +7,7 @@
 	file ext:	cpp
 	author:		Rainisng
 	
-	purpose:	
+	purpose:	Software vertex shader
 *********************************************************************/
 #include "stdafx.h"
 #include "VertexShader.h"
@@ -47,7 +47,7 @@ void Lerp( VertexShaderOutput& out, VertexShaderOutput& va0, VertexShaderOutput&
 	out.texCoord.x = texCoordRt.x * out.position.w;
 	out.texCoord.y = texCoordRt.y * out.position.w;
 
-	// linerly interpolate other attributes for performance's sake
+	// linearly interpolate other attributes for performance's sake
 	Lerp(out.attribute0, va0.attribute0, va1.attribute0, t);
 }
 
@@ -87,35 +87,6 @@ VertexShaderOutput VsFixedFunction::Main( const Vertex& vertex )
 	return output;
 }
 
-VertexShaderOutput VsFixedFunctionAltUv::Main( const Vertex& vertex )
-{
-	VertexShaderOutput output;
-
-	// clip space position
-	output.position = worldViewProjMatrix.Transform(vertex.position);
-
-	// StarCraft 2 uses a strange UV coordinate system
-	output.texCoord.x = vertex.texCoord.x * 2.0f;
-	output.texCoord.y = 1.0f - vertex.texCoord.y;
-
-	// lighting
-	Vector4& objSpaceLightPos = inverseWorldMatrix.Transform(lightPosition);
-
-	Vector3 objSpaceLightDir;
-	objSpaceLightDir.x = objSpaceLightPos.x;
-	objSpaceLightDir.y = objSpaceLightPos.y;
-	objSpaceLightDir.z = objSpaceLightPos.z;
-	objSpaceLightDir = objSpaceLightDir - vertex.position;
-	objSpaceLightDir.Normalize();
-
-	float angle = vertex.normal.Dot(objSpaceLightDir);
-	Saturate(angle);
-
-	output.attribute0 = diffuseColor * angle + ambientColor;
-
-	return output;
-}
-
 VertexShaderOutput VsNormalMap::Main( const Vertex& vertex )
 {
 	VertexShaderOutput output;
@@ -126,35 +97,6 @@ VertexShaderOutput VsNormalMap::Main( const Vertex& vertex )
 	// uv
 	output.texCoord.x = vertex.texCoord.x;
 	output.texCoord.y = vertex.texCoord.y;
-
-	// normal vector
-	Vector4& objSpaceLightPos = inverseWorldMatrix.Transform(lightPosition);
-
-	// light direction in tangent space
-	Vector3 objSpaceLightDir;
-	objSpaceLightDir.x = objSpaceLightPos.x;
-	objSpaceLightDir.y = objSpaceLightPos.y;
-	objSpaceLightDir.z = objSpaceLightPos.z;
-
-	objSpaceLightDir = objSpaceLightDir - vertex.position;
-
-	output.attribute0.x = vertex.tangent.Dot(objSpaceLightDir);
-	output.attribute0.y = vertex.binormal.Dot(objSpaceLightDir);
-	output.attribute0.z = vertex.normal.Dot(objSpaceLightDir);
-
-	return output;
-}
-
-VertexShaderOutput VsTangentSpaceLightingSc2Uv::Main( const Vertex& vertex )
-{
-	VertexShaderOutput output;
-
-	// clip space position
-	output.position = worldViewProjMatrix.Transform(vertex.position);
-
-	// StarCraft 2 uses a strange UV coordinate system
-	output.texCoord.x = vertex.texCoord.x * 2.0f;
-	output.texCoord.y = 1.0f - vertex.texCoord.y;
 
 	// normal vector
 	Vector4& objSpaceLightPos = inverseWorldMatrix.Transform(lightPosition);

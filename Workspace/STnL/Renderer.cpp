@@ -7,7 +7,7 @@
 	file ext:	cpp
 	author:		Rainsing
 	
-	purpose:	实际负责执行渲染操作的对象
+	purpose:	This is where all core rendering operations happen.
 *********************************************************************/
 #include "stdafx.h"
 #include "Renderer.h"
@@ -25,7 +25,6 @@
 Renderer::Renderer( void )
 {
 	m_renderTarget = NULL;
-
 	m_cullMode = CULL_MODE_CCW;
 }
 
@@ -35,7 +34,7 @@ void Renderer::SetRenderTarget( BackBuffer* renderTarget, DepthBuffer* depthBuff
 	m_depthBuffer = depthBuffer;
 }
 
-// 经典的整数Bresenham算法
+// The classic Bresenham algorithm.
 void Renderer::DrawLine( int x0, int y0, int x1, int y1, Color color )
 {
 	bool steep = abs(y1 - y0) > abs(x1 - x0);
@@ -80,15 +79,15 @@ void Renderer::Render( void )
 		unsigned nTriangles = renderUnit->m_ib->Size() / 3;
 
 		VsOutList vsOuts(nVerts);
-		TriangleList triangles;
+		TriangleList triangles;		// triangles that are spared by trivial rejection and backface removal
 
-		// 对每个顶点执行VS
+		// Execute vertex shader for each vertex.
 		for (unsigned j = 0; j < nVerts; j++)
 		{
 			vsOuts[j] = renderUnit->m_vs->Main((*renderUnit->m_vb)[j]);
 		}
 
-		// triangle setup (trivial-rejection, clipping)
+		// triangle setup
 		for (unsigned j = 0; j < nTriangles; j++)
 		{
 			Triangle tri;
@@ -126,12 +125,12 @@ void Renderer::Render( void )
 			position.y /= position.w;
 			position.z /= position.w;
 
-			// 转化到屏幕坐标
+			// to screen space
 			position.x = ( position.x + 1.0f) * halfRtWidth;
 			position.y = (-position.y + 1.0f) * halfRtHeight;
 		}
 		
-		// 光栅化每个三角形
+		// rasterization
 		for (unsigned j = 0; j < triangles.size(); j++)
 		{
 			VertexShaderOutput& v0 = vsOuts[triangles[j].iV0];
@@ -157,7 +156,7 @@ void Renderer::Render( void )
 				VertexShaderOutput* mv;
 				VertexShaderOutput* ev;
 				
-				// 按Y值给三个顶点排序
+				// sort the 3 vertices of a triangle by their Y position
 				if (v0.position.y < v1.position.y)
 				{
 					sv = &v0;
@@ -184,11 +183,9 @@ void Renderer::Render( void )
 					mv = &v2;
 				}
 
-				// 扫描线算法
+				// scan line algorithm
 				// --begin--
 
-				// 这种fill convention会导致由两个三角形共享的边上的像素被重绘一次，而顶点所在的像素会重绘更多次。
-				// 但是算法实现简单，而且保证没有漏洞（漏洞比重绘更致命）
 				int minY = int(sv->position.y);
 				int maxY = int(ev->position.y);
 				int midY = int(mv->position.y);
@@ -236,7 +233,7 @@ void Renderer::Render( void )
 					x2 += dx2;
 				}
 
-				// 扫描线算法
+				// scan line algorithm
 				// --end--
 			}
 		}
@@ -290,14 +287,6 @@ bool Renderer::TrivialReject( Triangle& triangle, VsOutList& vsOuts )
 		return true;
 	}
 
-	// test against z = 0 plane
-	if (v0.position.z < 0 && 
-		v1.position.z < 0 && 
-		v2.position.z < 0)
-	{
-		return true;
-	}
-
 	// test against z = w plane
 	if (v0.position.z > v0.position.w &&
 		v1.position.z > v1.position.w &&
@@ -306,8 +295,8 @@ bool Renderer::TrivialReject( Triangle& triangle, VsOutList& vsOuts )
 		return true;
 	}
 
-	// 避免渲染在摄像机后面的三角形
-	// TODO: clipping to the Near plane to get rid of this
+	// test against z = 0 plane
+	// No clipping here. Any triangle that is partially behind the camera is completely discarded.
 	if (v0.position.z < 0.0f || 
 		v1.position.z < 0.0f || 
 		v2.position.z < 0.0f)
@@ -369,10 +358,10 @@ bool Renderer::RemoveBackface( Triangle& triangle, VsOutList& vsOuts, CullMode c
 
 	Vector3 faceNormal = e1.Cross(e2);
 
-    if (faceNormal.Equal(Vector3::ZERO, 0.0001f))
-    {
-        return false;
-    }
+	/*if (faceNormal.Equal(Vector3::ZERO, 0.0001f))
+	{
+		return false;
+	}*/
 
 	if (cullMode == CULL_MODE_CCW)
 	{

@@ -7,7 +7,7 @@
 	file ext:	cpp
 	author:		Rainsing
 	
-	purpose:	顶点索引数组
+	purpose:	
 *********************************************************************/
 #include "stdafx.h"
 #include "IndexBuffer.h"

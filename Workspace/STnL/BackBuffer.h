@@ -7,9 +7,9 @@
 	file ext:	h
 	author:		Rainsing
 	
-	purpose:	软件渲染器的所有绘制操作都写入这个BackBuffer，在每一帧
-				的最后调用其Present()函数将buffer的内容blit到显示设备上。
-				这是这个软件渲染器中唯一一个和硬件打交道的对象。
+	purpose:	All drawing operations will eventually write to this 'back buffer'. 
+				At the end of each frame, Present() is called to blit the content of the buffer to the display.
+				This is the only class that talks to the graphics hardware (through Windows GDI).
 *********************************************************************/
 #ifndef BackBuffer_h__
 #define BackBuffer_h__
@@ -24,7 +24,7 @@ public:
 	~BackBuffer();
 
 	void Clear(Color color);
-	void Clear(void);	// 快速clear至全黑
+	void Clear(void);	// fast clear to pure black
 	void Present(void);
 	inline void SetPixel(int x, int y, Color color);
 	inline int GetWidth(void);

@@ -7,7 +7,7 @@
 	file ext:	h
 	author:		Rainsing
 	
-	purpose:	
+	purpose:	Software pixel shader
 *********************************************************************/
 #ifndef PixelShader_h__
 #define PixelShader_h__
@@ -20,6 +20,11 @@ class Texture;
 class PixelShader
 {
 public:
+
+	// The entry point of the pixel shader. 
+	// Output from the vertex shader is interpolated and passed in as 'vertexAttribute'.
+	// Any uniforms / constants or texture samplers can be defined as data member in derived classes.
+	// The function should return the final pixel color.
 	virtual Vector4 Main(VertexShaderOutput& vertexAttribute) = 0;
 };
 

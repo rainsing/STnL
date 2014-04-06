@@ -7,10 +7,9 @@
 	file ext:	cpp
 	author:		Rainsing
 	
-	purpose:	软件渲染器的所有绘制操作都写入这个BackBuffer，在每一帧
-				的最后调用其Present()函数将buffer的内容blit到显示设备上。
-				这是这个软件渲染器中唯一一个和硬件打交道的对象。本例使用
-				Windows GDI来实现blitting。
+	purpose:	All drawing operations will eventually write to this 'back buffer'. 
+				At the end of each frame, Present() is called to blit the content of the buffer to the display.
+				This is the only class that talks to the graphics hardware (through Windows GDI).
 *********************************************************************/
 #include "stdafx.h"
 #include "BackBuffer.h"
@@ -29,7 +28,7 @@ BackBuffer::BackBuffer( HWND hWnd, int width, int height )
 
 	bitmapinfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
 	bitmapinfo.bmiHeader.biWidth = m_width;
-	bitmapinfo.bmiHeader.biHeight = -m_height;	// 自顶向下的DIB，原点在左上角
+	bitmapinfo.bmiHeader.biHeight = -m_height;
 	bitmapinfo.bmiHeader.biPlanes = 1;
 	bitmapinfo.bmiHeader.biBitCount = 32;
 	bitmapinfo.bmiHeader.biCompression = BI_RGB;

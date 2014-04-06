@@ -7,7 +7,7 @@
 	file ext:	h
 	author:		Rainisng
 	
-	purpose:	实际负责执行渲染操作的对象
+	purpose:	This is where all core rendering operations happen.
 *********************************************************************/
 #ifndef Renderer_h__
 #define Renderer_h__
@@ -42,7 +42,6 @@ private:
 		unsigned short iV0;
 		unsigned short iV1;
 		unsigned short iV2;
-		Vector3 lighting;
 	};
 
 	typedef std::vector<RenderUnit*> RenderUnitList;
@@ -55,8 +54,8 @@ private:
 	bool RemoveBackface(Triangle& triangle, VsOutList& vsOuts, CullMode cullMode);
 	void DrawLine(int x0, int y0, int x1, int y1, Color color);
 
-	// 填充一条水平扫描线，线性插值两端点的顶点属性
-	// 要求保证x0 < x1
+	// Fill a horizontal scan line. The pixel shader is executed for each pixel along the scan line.
+	// It's required that x0 < x1.
 	void FillSpan(float x0, float x1, int y, VertexShaderOutput& va0, VertexShaderOutput& va1, PixelShader& ps);
 
 private:
