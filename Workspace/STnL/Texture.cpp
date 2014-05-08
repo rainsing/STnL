@@ -34,7 +34,7 @@ Texture::~Texture()
 
 Vector4 Texture::Sample( float u, float v )
 {
-	double dummy;
+	float dummy;
 	if (u > 1.0f)
 	{
 		u = modf(u, &dummy);
