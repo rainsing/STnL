@@ -22,10 +22,43 @@
 #include "BackBuffer.h"
 #include "Utilities.h"
 
+#include <process.h>
+
 Renderer::Renderer( void )
 {
 	m_renderTarget = NULL;
 	m_cullMode = CULL_MODE_CCW;
+
+	for (int i = 0; i < m_numThreads; i++)
+	{
+		m_threadWorkQueues[i].push_back(i + 10);
+
+		m_threadStartParameters[i].renderer = this;
+		m_threadStartParameters[i].threadIndex = i;
+
+		m_threadHandles[i] = (HANDLE)_beginthreadex(NULL, 0, ThreadFunction, (void*)(m_threadStartParameters + i), CREATE_SUSPENDED, NULL);
+		ResumeThread(m_threadHandles[i]);
+	}
+}
+
+unsigned __stdcall Renderer::ThreadFunction(void* data)
+{
+	ThreadStartParamters parameters = *((ThreadStartParamters*)data);
+
+	char str[256] = { 0 };
+	sprintf_s(str, 256, "My work item is %d!\n", (parameters.renderer->m_threadWorkQueues[parameters.threadIndex])[0]);
+	OutputDebugString(str);
+
+	return 0;
+}
+
+Renderer::~Renderer()
+{
+	for (int i = 0; i < m_numThreads; i++)
+	{
+		WaitForSingleObject(m_threadHandles[i], 1000);
+		CloseHandle(m_threadHandles[i]);
+	}
 }
 
 void Renderer::SetRenderTarget( BackBuffer* renderTarget, DepthBuffer* depthBuffer )

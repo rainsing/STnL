@@ -31,6 +31,7 @@ public:
 
 public:
 	Renderer(void);
+	~Renderer();
 
 	void SetRenderTarget(BackBuffer* renderTarget, DepthBuffer* depthBuffer);
 	void AddRenderUnit(RenderUnit* renderUnit);
@@ -64,6 +65,21 @@ private:
 	RenderUnitList m_renderUnitList;
 
 	CullMode m_cullMode;
+
+	static const int m_numThreads = 2;
+	HANDLE m_threadHandles[m_numThreads];
+
+	typedef std::vector<int> WorkQueue;
+	WorkQueue m_threadWorkQueues[m_numThreads];
+
+	struct ThreadStartParamters
+	{
+		Renderer* renderer;
+		int threadIndex;
+	};
+	ThreadStartParamters m_threadStartParameters[m_numThreads];
+
+	static unsigned __stdcall ThreadFunction( void* data );
 };
 
 #endif // Renderer_h__
