@@ -29,36 +29,65 @@ Renderer::Renderer( void )
 	m_renderTarget = NULL;
 	m_cullMode = CULL_MODE_CCW;
 
+    m_bExiting = false;
+    m_jobStartEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+
 	for (int i = 0; i < m_numThreads; i++)
 	{
-		m_threadWorkQueues[i].push_back(i + 10);
+        m_jobDoneEvents[i] = CreateEvent(NULL, FALSE, FALSE, NULL);
 
 		m_threadStartParameters[i].renderer = this;
 		m_threadStartParameters[i].threadIndex = i;
 
-		m_threadHandles[i] = (HANDLE)_beginthreadex(NULL, 0, ThreadFunction, (void*)(m_threadStartParameters + i), CREATE_SUSPENDED, NULL);
-		ResumeThread(m_threadHandles[i]);
+		m_threadHandles[i] = (HANDLE)_beginthreadex(NULL, 0, ThreadFunction, (void*)(m_threadStartParameters + i), 0, NULL);
 	}
 }
 
 unsigned __stdcall Renderer::ThreadFunction(void* data)
 {
-	ThreadStartParamters parameters = *((ThreadStartParamters*)data);
+	ThreadStartParamters& parameters = *((ThreadStartParamters*)data);
+    Renderer* renderer = parameters.renderer;
+    int threadIndex = parameters.threadIndex;
+    WorkQueue& workQueue = renderer->m_threadWorkQueues[threadIndex];
 
-	char str[256] = { 0 };
-	sprintf_s(str, 256, "My work item is %d!\n", (parameters.renderer->m_threadWorkQueues[parameters.threadIndex])[0]);
-	OutputDebugString(str);
+    while (!parameters.renderer->m_bExiting)
+    {
+        WaitForSingleObject(renderer->m_jobStartEvent, INFINITE);
+
+        /*char str[256] = { 0 };
+        sprintf_s(str, 256, "My work item is %d!\n", (renderer->m_threadWorkQueues[threadIndex])[0]);
+        OutputDebugString(str);*/
+
+        for (unsigned i = 0; i < workQueue.size(); i++)
+        {
+            WorkItem& item = workQueue[i];
+            renderer->FillSpan(item.x0, item.x1, item.y, item.va0, item.va1, *(item.pixelShader));
+        }
+
+        SetEvent(renderer->m_jobDoneEvents[threadIndex]);
+    }
 
 	return 0;
 }
 
 Renderer::~Renderer()
 {
+    m_bExiting = true;
+
+    for (int i = 0; i < m_numThreads; i++)
+    {
+        SetEvent(m_jobStartEvent);
+    }
+
 	for (int i = 0; i < m_numThreads; i++)
-	{
-		WaitForSingleObject(m_threadHandles[i], 1000);
+	{ 
+		WaitForSingleObject(m_threadHandles[i], INFINITE);
+
 		CloseHandle(m_threadHandles[i]);
+        CloseHandle(m_jobDoneEvents[i]);
 	}
+
+    CloseHandle(m_jobStartEvent);
 }
 
 void Renderer::SetRenderTarget( BackBuffer* renderTarget, DepthBuffer* depthBuffer )
@@ -255,11 +284,13 @@ void Renderer::Render( void )
 
 					if (x1 < x2)
 					{
-						FillSpan(x1, x2, y, va1, va2, *renderUnit->m_ps);
+						//FillSpan(x1, x2, y, va1, va2, *renderUnit->m_ps);
+                        DispatchSpanFill(x1, x2, y, va1, va2, *renderUnit->m_ps);
 					}
 					else
 					{
-						FillSpan(x2, x1, y, va2, va1, *renderUnit->m_ps);
+						//FillSpan(x2, x1, y, va2, va1, *renderUnit->m_ps);
+                        DispatchSpanFill(x2, x1, y, va2, va1, *renderUnit->m_ps);
 					}
 
 					x1 += dx1;
@@ -270,9 +301,26 @@ void Renderer::Render( void )
 				// --end--
 			}
 		}
-
-		delete renderUnit;
 	}
+
+    // Tell the worker threads to start doing their job.
+    for (int i = 0; i < m_numThreads; i++)
+    {
+        SetEvent(m_jobStartEvent);
+    }
+
+    // Wait here until all the worker threads are done with their job.
+    WaitForMultipleObjects(m_numThreads, m_jobDoneEvents, TRUE, INFINITE);
+
+    for (int i = 0; i < m_numThreads; i++)
+    {
+        m_threadWorkQueues[i].clear();
+    }
+
+    for (unsigned i = 0; i < m_renderUnitList.size(); i++)
+    {
+        delete m_renderUnitList[i];
+    }
 
 	m_renderUnitList.clear();
 }
@@ -433,4 +481,24 @@ void Renderer::FillSpan( float x0, float x1, int y, VertexShaderOutput& va0, Ver
 		int b = Float2Int(color.z * 255.0f);
 		m_renderTarget->SetPixel(x, y, COLOR_RGB(r, g, b));
 	}
+}
+
+void Renderer::DispatchSpanFill( float x0, float x1, int y, VertexShaderOutput& va0, VertexShaderOutput& va1, PixelShader& ps )
+{
+    if (y <= (m_renderTarget->GetHeight() >> 2))
+    {
+        m_threadWorkQueues[0].emplace_back(Vector2(x0, x1), y, va0, va1, ps);
+    } 
+    else if (y <= (m_renderTarget->GetHeight() >> 1))
+    {
+        m_threadWorkQueues[1].emplace_back(Vector2(x0, x1), y, va0, va1, ps);
+    }
+    else if (y <= (m_renderTarget->GetHeight() >> 2) + (m_renderTarget->GetHeight() >> 1))
+    {
+        m_threadWorkQueues[2].emplace_back(Vector2(x0, x1), y, va0, va1, ps);
+    }
+    else
+    {
+        m_threadWorkQueues[3].emplace_back(Vector2(x0, x1), y, va0, va1, ps);
+    }
 }

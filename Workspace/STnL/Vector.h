@@ -15,6 +15,17 @@
 class Vector2
 {
 public:
+    inline Vector2(void)
+    {
+        x = y = 0.0f;
+    }
+
+    inline Vector2(float _x, float _y)
+    {
+        x = _x;
+        y = _y;
+    }
+
 	float x;
 	float y;
 };

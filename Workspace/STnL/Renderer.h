@@ -59,6 +59,8 @@ private:
 	// It's required that x0 < x1.
 	void FillSpan(float x0, float x1, int y, VertexShaderOutput& va0, VertexShaderOutput& va1, PixelShader& ps);
 
+    void DispatchSpanFill(float x0, float x1, int y, VertexShaderOutput& va0, VertexShaderOutput& va1, PixelShader& ps);
+
 private:
 	BackBuffer* m_renderTarget;
 	DepthBuffer* m_depthBuffer;
@@ -66,11 +68,34 @@ private:
 
 	CullMode m_cullMode;
 
-	static const int m_numThreads = 2;
+	static const int m_numThreads = 4;
 	HANDLE m_threadHandles[m_numThreads];
 
-	typedef std::vector<int> WorkQueue;
+    struct WorkItem
+    {
+        float x0;
+        float x1;
+        int y;
+        VertexShaderOutput va0;
+        VertexShaderOutput va1;
+        PixelShader* pixelShader;
+
+        WorkItem(Vector2 _x01, int _y, VertexShaderOutput& _va0, VertexShaderOutput& _va1, PixelShader& _ps)
+        {
+            x0 = _x01.x;
+            x1 = _x01.y;
+            y = _y;
+            va0 = _va0;
+            va1 = _va1;
+            pixelShader = &_ps;
+        }
+    };
+
+	typedef std::vector<WorkItem> WorkQueue;
 	WorkQueue m_threadWorkQueues[m_numThreads];
+
+    HANDLE m_jobStartEvent;
+    HANDLE m_jobDoneEvents[m_numThreads];
 
 	struct ThreadStartParamters
 	{
@@ -78,6 +103,8 @@ private:
 		int threadIndex;
 	};
 	ThreadStartParamters m_threadStartParameters[m_numThreads];
+
+    bool m_bExiting;
 
 	static unsigned __stdcall ThreadFunction( void* data );
 };
