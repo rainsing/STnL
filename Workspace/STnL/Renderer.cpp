@@ -28,66 +28,40 @@ Renderer::Renderer( void )
 {
 	m_renderTarget = NULL;
 	m_cullMode = CULL_MODE_CCW;
-
     m_bExiting = false;
-    m_jobStartEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+
+    m_spanFillingBacklogReadyEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
 
 	for (int i = 0; i < m_numThreads; i++)
 	{
-        m_jobDoneEvents[i] = CreateEvent(NULL, FALSE, FALSE, NULL);
+        m_spanFillingWorkDoneEvents[i] = CreateEvent(NULL, FALSE, FALSE, NULL);
 
-		m_threadStartParameters[i].renderer = this;
-		m_threadStartParameters[i].threadIndex = i;
+		m_spanFillingThreadStartArgs[i].renderer = this;
+		m_spanFillingThreadStartArgs[i].threadIndex = i;
 
-		m_threadHandles[i] = (HANDLE)_beginthreadex(NULL, 0, ThreadFunction, (void*)(m_threadStartParameters + i), 0, NULL);
+		m_spanFillingThreads[i] = (HANDLE)_beginthreadex(NULL, 0, SpanFillingThreadMain, (void*)(m_spanFillingThreadStartArgs + i), 0, NULL);
 	}
-}
-
-unsigned __stdcall Renderer::ThreadFunction(void* data)
-{
-	ThreadStartParamters& parameters = *((ThreadStartParamters*)data);
-    Renderer* renderer = parameters.renderer;
-    int threadIndex = parameters.threadIndex;
-    WorkQueue& workQueue = renderer->m_threadWorkQueues[threadIndex];
-
-    while (!parameters.renderer->m_bExiting)
-    {
-        WaitForSingleObject(renderer->m_jobStartEvent, INFINITE);
-
-        /*char str[256] = { 0 };
-        sprintf_s(str, 256, "My work item is %d!\n", (renderer->m_threadWorkQueues[threadIndex])[0]);
-        OutputDebugString(str);*/
-
-        for (unsigned i = 0; i < workQueue.size(); i++)
-        {
-            WorkItem& item = workQueue[i];
-            renderer->FillSpan(item.x0, item.x1, item.y, item.va0, item.va1, *(item.pixelShader));
-        }
-
-        SetEvent(renderer->m_jobDoneEvents[threadIndex]);
-    }
-
-	return 0;
 }
 
 Renderer::~Renderer()
 {
     m_bExiting = true;
 
+    // This is necessary for the threads to return from their main function.
     for (int i = 0; i < m_numThreads; i++)
     {
-        SetEvent(m_jobStartEvent);
+        SetEvent(m_spanFillingBacklogReadyEvent);
     }
+
+    WaitForMultipleObjects(m_numThreads, m_spanFillingThreads, TRUE, INFINITE);
 
 	for (int i = 0; i < m_numThreads; i++)
 	{ 
-		WaitForSingleObject(m_threadHandles[i], INFINITE);
-
-		CloseHandle(m_threadHandles[i]);
-        CloseHandle(m_jobDoneEvents[i]);
+		CloseHandle(m_spanFillingThreads[i]);
+        CloseHandle(m_spanFillingWorkDoneEvents[i]);
 	}
 
-    CloseHandle(m_jobStartEvent);
+    CloseHandle(m_spanFillingBacklogReadyEvent);
 }
 
 void Renderer::SetRenderTarget( BackBuffer* renderTarget, DepthBuffer* depthBuffer )
@@ -284,13 +258,11 @@ void Renderer::Render( void )
 
 					if (x1 < x2)
 					{
-						//FillSpan(x1, x2, y, va1, va2, *renderUnit->m_ps);
-                        DispatchSpanFill(x1, x2, y, va1, va2, *renderUnit->m_ps);
+                        DispatchSpanFillingWork(x1, x2, y, va1, va2, *renderUnit->m_ps);
 					}
 					else
 					{
-						//FillSpan(x2, x1, y, va2, va1, *renderUnit->m_ps);
-                        DispatchSpanFill(x2, x1, y, va2, va1, *renderUnit->m_ps);
+                        DispatchSpanFillingWork(x2, x1, y, va2, va1, *renderUnit->m_ps);
 					}
 
 					x1 += dx1;
@@ -304,17 +276,19 @@ void Renderer::Render( void )
 	}
 
     // Tell the worker threads to start doing their job.
+    // The loop is nessesary as each time m_spanFillingBacklogReadyEvent is signaled 
+    // only one thread will be released from waiting.
     for (int i = 0; i < m_numThreads; i++)
     {
-        SetEvent(m_jobStartEvent);
+        SetEvent(m_spanFillingBacklogReadyEvent);
     }
 
     // Wait here until all the worker threads are done with their job.
-    WaitForMultipleObjects(m_numThreads, m_jobDoneEvents, TRUE, INFINITE);
+    WaitForMultipleObjects(m_numThreads, m_spanFillingWorkDoneEvents, TRUE, INFINITE);
 
     for (int i = 0; i < m_numThreads; i++)
     {
-        m_threadWorkQueues[i].clear();
+        m_spanFillingBacklogs[i].clear();
     }
 
     for (unsigned i = 0; i < m_renderUnitList.size(); i++)
@@ -483,22 +457,43 @@ void Renderer::FillSpan( float x0, float x1, int y, VertexShaderOutput& va0, Ver
 	}
 }
 
-void Renderer::DispatchSpanFill( float x0, float x1, int y, VertexShaderOutput& va0, VertexShaderOutput& va1, PixelShader& ps )
+void Renderer::DispatchSpanFillingWork( float x0, float x1, int y, VertexShaderOutput& va0, VertexShaderOutput& va1, PixelShader& ps )
 {
-    if (y <= (m_renderTarget->GetHeight() >> 2))
+    if (y < 0 || y >= m_renderTarget->GetHeight())
     {
-        m_threadWorkQueues[0].emplace_back(Vector2(x0, x1), y, va0, va1, ps);
-    } 
-    else if (y <= (m_renderTarget->GetHeight() >> 1))
-    {
-        m_threadWorkQueues[1].emplace_back(Vector2(x0, x1), y, va0, va1, ps);
+        return;
     }
-    else if (y <= (m_renderTarget->GetHeight() >> 2) + (m_renderTarget->GetHeight() >> 1))
+
+    int h = m_renderTarget->GetHeight() / m_numThreads;
+    SpanFillingBacklog* workQueue = m_spanFillingBacklogs + y / h;
+
+    // VS2012's vector::emplace_back() implementation doesn't support more than 5 arguments.
+    // That's why we have a Vector2 here...
+    workQueue->emplace_back(Vector2(x0, x1), y, va0, va1, ps);  
+}
+
+unsigned __stdcall Renderer::SpanFillingThreadMain(void* startArgs)
+{
+	SpanFillingThreadStartArgs& parameters = *((SpanFillingThreadStartArgs*)startArgs);
+    Renderer* renderer = parameters.renderer;
+    int threadIndex = parameters.threadIndex;
+    SpanFillingBacklog& backlog = renderer->m_spanFillingBacklogs[threadIndex];
+
+    while (!parameters.renderer->m_bExiting)
     {
-        m_threadWorkQueues[2].emplace_back(Vector2(x0, x1), y, va0, va1, ps);
+        // wait for the main thread to feed us work
+        WaitForSingleObject(renderer->m_spanFillingBacklogReadyEvent, INFINITE);
+
+        // do the work
+        for (unsigned i = 0; i < backlog.size(); i++)
+        {
+            SpanFillingWork& work = backlog[i];
+            renderer->FillSpan(work.x0, work.x1, work.y, work.va0, work.va1, *(work.pixelShader));
+        }
+
+        // tell the main thread that we've finished our work
+        SetEvent(renderer->m_spanFillingWorkDoneEvents[threadIndex]);
     }
-    else
-    {
-        m_threadWorkQueues[3].emplace_back(Vector2(x0, x1), y, va0, va1, ps);
-    }
+
+	return 0;
 }
