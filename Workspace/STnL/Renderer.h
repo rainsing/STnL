@@ -113,7 +113,7 @@ private:
     SpanFillingThreadStartArgs m_spanFillingThreadStartArgs[m_numThreads];
 	SpanFillingBacklog m_spanFillingBacklogs[m_numThreads];
 
-    // These events are auto-reseting and initially nonsignaled.
+    // These events are auto-resetting and initially nonsignaled.
     HANDLE m_spanFillingBacklogReadyEvent;
     HANDLE m_spanFillingWorkDoneEvents[m_numThreads];
 

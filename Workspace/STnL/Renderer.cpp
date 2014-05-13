@@ -474,12 +474,12 @@ void Renderer::DispatchSpanFillingWork( float x0, float x1, int y, VertexShaderO
 
 unsigned __stdcall Renderer::SpanFillingThreadMain(void* startArgs)
 {
-	SpanFillingThreadStartArgs& parameters = *((SpanFillingThreadStartArgs*)startArgs);
-    Renderer* renderer = parameters.renderer;
-    int threadIndex = parameters.threadIndex;
+	SpanFillingThreadStartArgs& args = *((SpanFillingThreadStartArgs*)startArgs);
+    Renderer* renderer = args.renderer;
+    int threadIndex = args.threadIndex;
     SpanFillingBacklog& backlog = renderer->m_spanFillingBacklogs[threadIndex];
 
-    while (!parameters.renderer->m_bExiting)
+    while (!renderer->m_bExiting)
     {
         // wait for the main thread to feed us work
         WaitForSingleObject(renderer->m_spanFillingBacklogReadyEvent, INFINITE);
