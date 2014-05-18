@@ -30,16 +30,15 @@ Renderer::Renderer( void )
 	m_cullMode = CULL_MODE_CCW;
     m_bExiting = false;
 
-    m_spanFillingBacklogReadyEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
-
 	for (int i = 0; i < m_numThreads; i++)
 	{
+        m_spanFillingBacklogReadyEvents[i] = CreateEvent(NULL, FALSE, FALSE, NULL);
         m_spanFillingWorkDoneEvents[i] = CreateEvent(NULL, FALSE, FALSE, NULL);
 
-		m_spanFillingThreadStartArgs[i].renderer = this;
-		m_spanFillingThreadStartArgs[i].threadIndex = i;
+        m_spanFillingThreadStartArgs[i].renderer = this;
+        m_spanFillingThreadStartArgs[i].threadIndex = i;
 
-		m_spanFillingThreads[i] = (HANDLE)_beginthreadex(NULL, 0, SpanFillingThreadMain, (void*)(m_spanFillingThreadStartArgs + i), 0, NULL);
+        m_spanFillingThreads[i] = (HANDLE)_beginthreadex(NULL, 0, SpanFillingThreadMain, (void*)(m_spanFillingThreadStartArgs + i), 0, NULL);
 	}
 }
 
@@ -48,16 +47,19 @@ Renderer::~Renderer()
     m_bExiting = true;
 
     // This is necessary for the threads to return from their main function.
-    SetEvent(m_spanFillingBacklogReadyEvent);
+    for (int i = 0; i < m_numThreads; i++)
+    {
+        SetEvent(m_spanFillingBacklogReadyEvents[i]);
+    }
+    
     WaitForMultipleObjects(m_numThreads, m_spanFillingThreads, TRUE, INFINITE);
 
-	for (int i = 0; i < m_numThreads; i++)
-	{ 
-		CloseHandle(m_spanFillingThreads[i]);
+    for (int i = 0; i < m_numThreads; i++)
+    { 
+        CloseHandle(m_spanFillingThreads[i]);
         CloseHandle(m_spanFillingWorkDoneEvents[i]);
-	}
-
-    CloseHandle(m_spanFillingBacklogReadyEvent);
+        CloseHandle(m_spanFillingBacklogReadyEvents[i]);
+    }
 }
 
 void Renderer::SetRenderTarget( BackBuffer* renderTarget, DepthBuffer* depthBuffer )
@@ -272,7 +274,10 @@ void Renderer::Render( void )
 	}
 
     // Tell the worker threads to start doing their job.
-    SetEvent(m_spanFillingBacklogReadyEvent);
+    for (int i = 0; i < m_numThreads; i++)
+    {
+        SetEvent(m_spanFillingBacklogReadyEvents[i]);
+    }
 
     // Wait here until all the worker threads are done with their job.
     WaitForMultipleObjects(m_numThreads, m_spanFillingWorkDoneEvents, TRUE, INFINITE);
@@ -473,10 +478,7 @@ unsigned __stdcall Renderer::SpanFillingThreadMain(void* startArgs)
     while (!renderer->m_bExiting)
     {
         // wait for the main thread to feed us work
-        WaitForSingleObject(renderer->m_spanFillingBacklogReadyEvent, INFINITE);
-
-        // Immediately reset this event to ensure that this loop runs only once per frame.
-        ResetEvent(renderer->m_spanFillingBacklogReadyEvent);
+        WaitForSingleObject(renderer->m_spanFillingBacklogReadyEvents[threadIndex], INFINITE);
 
         // do the work
         for (unsigned i = 0; i < backlog.size(); i++)
