@@ -1,3 +1,5 @@
+![image](https://user-images.githubusercontent.com/2289361/188794031-8aeacf03-742a-43ef-be7e-729d8090c5b8.png)
+
 STnl stands for Software Transform and Lighting. It's a simple software renderer / rasterizer that demonstrates the basic principles of a programmable GPU.
 
 We use 4 threads to render each horizontal quarter of the screen in parallel, so this application runs best on systems with 4 or more CPU cores.
